@@ -8,7 +8,7 @@ use lopdf::{
     content::{Content, Operation},
     dictionary, Document, Object, Stream,
 };
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 use tauri_specta::Event;
 use zip::{write::SimpleFileOptions, ZipWriter};
 
@@ -83,7 +83,11 @@ pub fn cbz(app: &AppHandle, comic: &Comic) -> anyhow::Result<()> {
         .get_comic_export_dir(app)
         .context("Failed to get comic export directory")?;
     // Generate ComicInfo
-    let comic_info = ComicInfo::from(comic.clone());
+    let ui_locale = app.state::<parking_lot::RwLock<crate::config::Config>>()
+        .read()
+        .ui_locale
+        .clone();
+    let comic_info = ComicInfo::from_comic(&ui_locale, comic.clone());
     // Serialize ComicInfo to xml
     let comic_info_xml =
         yaserde::ser::to_string_with_config(&comic_info, &cfg).map_err(|err_msg| {

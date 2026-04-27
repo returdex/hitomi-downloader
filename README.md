@@ -21,7 +21,7 @@ Pre-compiled packages are available on the [Releases page](https://github.com/la
 | ---------------------------------- | ------------------------------------------------------------ |
 | 🖼️ GUI                              | Built with [Tauri](https://v2.tauri.app/start/), lightweight, clean, and easy to use. |
 | ⚡ Multi-threaded Downloading       | Maximize download speed.                                     |
-| 📂 Export                           | One-click export to universal PDF or CBZ formats.            |
+| 📂 Export                           | One-click export to universal PDF or CBZ formats. When the UI language is set to `zh-CN`, CBZ export translates tags in `ComicInfo.xml` to Chinese. |
 | 🌐 Internationalization             | Built-in multi-language support system (i18n).               |
 | 🗂️ Customizable Directory Structure | Highly customizable directory structure and naming rules, supporting fields like type, author, language, etc. Say goodbye to the hassle of manual organization. |
 
@@ -38,6 +38,14 @@ Pre-compiled packages are available on the [Releases page](https://github.com/la
 3.  After downloading, click the `Open Folder` button to check the results.
 
 **By the way, you can export to PDF/CBZ(ZIP) in the `Local` tab.**
+
+### Tag Translation in CBZ Export
+
+When the interface language is set to `zh-CN`, the app translates comic tags written to `ComicInfo.xml` during CBZ export.
+
+- Only CBZ metadata tags are translated. Internal app metadata and search tags remain unchanged.
+- Unknown or unmapped tags fall back to the original tag text.
+- The translation dictionary is based on [scooderic/exhentai-tags-chinese-translation](https://github.com/scooderic/exhentai-tags-chinese-translation), using [`dist/ehtags-cn.json`](https://raw.githubusercontent.com/scooderic/exhentai-tags-chinese-translation/master/dist/ehtags-cn.json).
 
 📹 The video below demonstrates the full usage process. **It's Safe For Work, so feel free to watch.**
 
@@ -120,6 +128,9 @@ For other cases, feel free to submit a PR directly, for example:
 ## Thanks
 
 [Pupil](https://github.com/tom5079/Pupil)
+
+Tag translation dictionary reference:
+[scooderic/exhentai-tags-chinese-translation](https://github.com/scooderic/exhentai-tags-chinese-translation)
 
 ## 💬 Other
 

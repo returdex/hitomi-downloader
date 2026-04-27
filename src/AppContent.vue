@@ -29,6 +29,10 @@ const localeOptions = Object.entries(locales).map(([key, value]) => ({
 
 const searchPaneRef = ref<InstanceType<typeof SearchPane>>()
 
+function isSupportedLocale(value: string): value is keyof typeof locales {
+  return value in locales
+}
+
 watch(
   () => store.config,
   async () => {
@@ -47,7 +51,14 @@ onMounted(async () => {
     event.preventDefault()
   }
   // get the configuration
-  store.config = await commands.getConfig()
+  const config = await commands.getConfig()
+  if (isSupportedLocale(config.uiLocale)) {
+    locale.value = config.uiLocale
+  }
+  else {
+    config.uiLocale = locale.value
+  }
+  store.config = config
   // check the logs directory size
   const result = await commands.getLogsDirSize()
   if (result.status === 'error') {
@@ -78,6 +89,16 @@ onMounted(async () => {
     })
   }
 })
+
+watch(
+  locale,
+  (value) => {
+    if (store.config === undefined || store.config.uiLocale === value) {
+      return
+    }
+    store.config.uiLocale = value
+  },
+)
 </script>
 
 <template>

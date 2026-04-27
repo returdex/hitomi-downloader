@@ -21,7 +21,7 @@
 | --------------- | ------------------------------------------------------------ |
 | 🖼️图形界面       | 基于 [Tauri](https://www.google.com/url?sa=E&q=https%3A%2F%2Fv2.tauri.app%2Fstart%2F) 构建，轻量、简洁、易用 |
 | ⚡多线程下载     | 最大化下载速度                                               |
-| 📂漫画导出       | 一键将下载内容导出为通用的 PDF 或 CBZ 格式                   |
+| 📂漫画导出       | 一键将下载内容导出为通用的 PDF 或 CBZ 格式。当界面语言为 `zh-CN` 时，导出 CBZ 会把 `ComicInfo.xml` 中的标签翻译为中文 |
 | 🌐国际化         | 内置多语言支持系统 (i18n)                                    |
 | 🗂️自定义目录结构 | 高度可定制的目录结构和命名规则，支持类型、作者、语言等字段，彻底告别手动整理的烦恼 |
 
@@ -37,6 +37,14 @@
 3. 下载完成后点击`打开目录`按钮查看结果
 
 **顺带一提，你可以在`本地库存`导出为pdf/cbz(zip)**
+
+### CBZ 导出标签翻译
+
+当界面语言设置为 `zh-CN` 时，程序会在导出 CBZ 时，将写入 `ComicInfo.xml` 的漫画标签翻译为中文。
+
+- 只会翻译 CBZ 元数据里的标签，不会修改程序内部元数据，也不会影响标签搜索。
+- 如果某个标签在词典中没有对应翻译，会保留原始标签文本。
+- 当前使用的翻译词典来自 [scooderic/exhentai-tags-chinese-translation](https://github.com/scooderic/exhentai-tags-chinese-translation) 项目的 [`dist/ehtags-cn.json`](https://raw.githubusercontent.com/scooderic/exhentai-tags-chinese-translation/master/dist/ehtags-cn.json)。
 
 📹 下面的视频是完整使用流程，**没有H内容，请放心观看**
 
@@ -119,6 +127,9 @@ pnpm tauri build
 ## 感谢
 
 [Pupil](https://github.com/tom5079/Pupil)
+
+标签翻译词典引用：
+[scooderic/exhentai-tags-chinese-translation](https://github.com/scooderic/exhentai-tags-chinese-translation)
 
 ## 💬其他
 

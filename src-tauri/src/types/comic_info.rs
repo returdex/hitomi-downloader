@@ -2,7 +2,9 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 use yaserde::{YaDeserialize, YaSerialize};
 
-use super::Comic;
+use crate::translator;
+
+use super::{Comic, Tag};
 
 /// https://wiki.kavitareader.com/guides/metadata/comics/
 #[derive(
@@ -65,4 +67,39 @@ impl From<Comic> for ComicInfo {
             count: 1,
         }
     }
+}
+
+impl ComicInfo {
+    pub fn from_comic(ui_locale: &str, mut comic: Comic) -> Self {
+        if should_translate_tags(ui_locale) {
+            comic.tags = translate_tags(comic.tags, ui_locale);
+        }
+
+        ComicInfo::from(comic)
+    }
+}
+
+fn translate_tags(tags: Vec<Tag>, ui_locale: &str) -> Vec<Tag> {
+    let raw_tags = tags.iter().map(|tag| tag.tag.clone()).collect::<Vec<_>>();
+
+    let translated_tags = match translator::translate_tags(&raw_tags, ui_locale) {
+        Ok(translated_tags) if translated_tags.len() == tags.len() => translated_tags,
+        Ok(_) => return tags,
+        Err(err) => {
+            tracing::warn!("Failed to translate tags for ComicInfo export: {err:#}");
+            return tags;
+        }
+    };
+
+    tags.into_iter()
+        .zip(translated_tags)
+        .map(|(mut tag, translated_tag)| {
+            tag.tag = translated_tag;
+            tag
+        })
+        .collect()
+}
+
+fn should_translate_tags(locale: &str) -> bool {
+    locale.eq_ignore_ascii_case("zh-CN")
 }

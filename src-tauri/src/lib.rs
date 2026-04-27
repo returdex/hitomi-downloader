@@ -8,6 +8,7 @@ mod extensions;
 mod hitomi;
 mod hitomi_client;
 mod logger;
+mod translator;
 mod types;
 mod utils;
 

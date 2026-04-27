@@ -11,6 +11,7 @@ use crate::types::{DownloadFormat, ProxyMode};
 pub struct Config {
     pub download_dir: PathBuf,
     pub export_dir: PathBuf,
+    pub ui_locale: String,
     pub enable_file_logger: bool,
     pub download_format: DownloadFormat,
     pub dir_fmt: String,
@@ -75,6 +76,7 @@ impl Config {
         Config {
             download_dir: app_data_dir.join("download"),
             export_dir: app_data_dir.join("export"),
+            ui_locale: String::new(),
             enable_file_logger: true,
             download_format: DownloadFormat::Webp,
             dir_fmt: "{title} - {id}".to_string(),
