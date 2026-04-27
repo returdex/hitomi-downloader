@@ -1,136 +1,159 @@
 <p align="center">
-    <img src="https://github.com/user-attachments/assets/efd0470a-f5cb-4c1d-a0c3-3f5c39113933" style="align-self: center"/>
+  <img src="https://github.com/user-attachments/assets/efd0470a-f5cb-4c1d-a0c3-3f5c39113933" alt="Hitomi Downloader banner" />
 </p>
 
+# Hitomi Downloader
 
-# 📚Hitomi下载器
+一个基于 Tauri、Vue 3 和 Rust 构建的 `hitomi.la` 桌面下载器。
 
-一个带GUI的用于 hitomi hitomi.la 的多线程下载器
+[English](./README.md)
 
-[English](./README.md) / 简体中文
+## 项目简介
 
-## 📥 快速下载
+Hitomi Downloader 提供了从搜索、下载、管理到导出的完整桌面端流程，适合将漫画内容下载到本地后继续整理、归档和离线阅读。
 
-[Release页面](https://github.com/lanyeeee/hitomi-downloader/releases)提供了预编译的安装包，直接下载即可使用
+当前代码已经支持：
 
-**如果本项目对你有帮助，欢迎点个 Star ⭐ 支持！你的支持是我持续更新维护的动力 🙏**
+- 通过关键词搜索漫画
+- 通过漫画 ID 或 `hitomi.la` 链接直接定位作品
+- 多任务下载，支持暂停、继续、取消和进度展示
+- 浏览本地已下载漫画
+- 单本导出为 PDF 或 CBZ
+- 一键批量导出本地全部漫画为 PDF 或 CBZ
+- 跳过已经存在同格式导出文件的项目
+- 当界面语言为 `zh-CN` 时，为 CBZ 的 `ComicInfo.xml` 写入中文标签翻译
+- 自定义下载目录、导出目录、目录命名规则和代理配置
+- 内置多语言支持
 
-## ✨ 主要特性
+## 界面预览
 
-| 特性            | 说明                                                         |
-| --------------- | ------------------------------------------------------------ |
-| 🖼️图形界面       | 基于 [Tauri](https://www.google.com/url?sa=E&q=https%3A%2F%2Fv2.tauri.app%2Fstart%2F) 构建，轻量、简洁、易用 |
-| ⚡多线程下载     | 最大化下载速度                                               |
-| 📂漫画导出       | 一键将下载内容导出为通用的 PDF 或 CBZ 格式。当界面语言为 `zh-CN` 时，导出 CBZ 会把 `ComicInfo.xml` 中的标签翻译为中文 |
-| 🌐国际化         | 内置多语言支持系统 (i18n)                                    |
-| 🗂️自定义目录结构 | 高度可定制的目录结构和命名规则，支持类型、作者、语言等字段，彻底告别手动整理的烦恼 |
+![搜索与详情](https://github.com/user-attachments/assets/fd93fd2f-db16-43b6-86cf-aa643eb572c8)
+![下载与本地库存](https://github.com/user-attachments/assets/81a859f2-2a06-4eca-b45f-4f6555cc62c0)
 
-## 🖥️图形界面
+## 使用说明
 
-![image](https://github.com/user-attachments/assets/fd93fd2f-db16-43b6-86cf-aa643eb572c8)
-![image](https://github.com/user-attachments/assets/81a859f2-2a06-4eca-b45f-4f6555cc62c0)
+1. 在 `Search` 页签中输入关键词、漫画 ID 或 `hitomi.la` 链接进行搜索。
+2. 在搜索结果卡片上直接开始下载，或进入 `Comic` 页签查看详情后再下载。
+3. 右侧下载面板会显示当前任务状态和速度。
+4. 在 `Local` 页签中查看本地已下载漫画，并执行导出操作。
 
-## 📖 使用方法
+### 本地导出
 
-1. 使用`漫画搜索`搜索关键词
-2. 直接点击卡片上的`一键下载` 或者 点击封面或标题进入`漫画详情`，里面也有`一键下载`
-3. 下载完成后点击`打开目录`按钮查看结果
+`Local` 页签目前支持单本导出和批量导出：
 
-**顺带一提，你可以在`本地库存`导出为pdf/cbz(zip)**
+- `Export PDF`：将单本漫画导出为 PDF
+- `Export CBZ`：将单本漫画导出为 CBZ
+- `Export All PDF`：将本地漫画全部导出为 PDF
+- `Export All CBZ`：将本地漫画全部导出为 CBZ
+- `Skip existing PDF/CBZ`：如果目标文件已存在，则跳过该项目
 
-### CBZ 导出标签翻译
+批量导出结束后，界面会显示导出成功、跳过和失败的数量统计。跳过同格式文件的开关会保存在本地，方便下次继续使用。
 
-当界面语言设置为 `zh-CN` 时，程序会在导出 CBZ 时，将写入 `ComicInfo.xml` 的漫画标签翻译为中文。
+### CBZ 标签翻译
 
-- 只会翻译 CBZ 元数据里的标签，不会修改程序内部元数据，也不会影响标签搜索。
-- 如果某个标签在词典中没有对应翻译，会保留原始标签文本。
-- 当前使用的翻译词典来自 [scooderic/exhentai-tags-chinese-translation](https://github.com/scooderic/exhentai-tags-chinese-translation) 项目的 [`dist/ehtags-cn.json`](https://raw.githubusercontent.com/scooderic/exhentai-tags-chinese-translation/master/dist/ehtags-cn.json)。
+当界面语言设置为 `zh-CN` 时，程序会在导出 CBZ 时翻译写入 `ComicInfo.xml` 的标签内容。
 
-📹 下面的视频是完整使用流程，**没有H内容，请放心观看**
+- 只会翻译 CBZ 元数据中的标签
+- 不会改动程序内部数据或搜索使用的原始标签
+- 没有匹配翻译的标签会保留原文
 
-https://github.com/user-attachments/assets/d2d0e577-c074-41ca-996f-445d52e2cce5
+当前翻译词典来自 [scooderic/exhentai-tags-chinese-translation](https://github.com/scooderic/exhentai-tags-chinese-translation)。
 
+## 配置说明
 
+可以在设置对话框中调整以下内容：
 
-## ⚠️关于被杀毒软件误判为病毒
+- 下载图片格式：`webp` 或 `avif`
+- 代理模式：系统代理、直连、自定义代理
+- 下载目录
+- 导出目录
+- 目录命名模板
 
-对于个人开发的项目来说，这个问题几乎是无解的(~~需要购买数字证书给软件签名，甚至给杀毒软件交保护费~~)  
-我能想到的解决办法只有：
+目录模板目前支持这些占位符：
 
-1. 根据下面的**如何构建(build)**，自行编译
-2. 希望你相信我的承诺，我承诺你在[Release页面](https://github.com/lanyeeee/hitomi-downloader/releases)下载到的所有东西都是安全的
+- `{id}`
+- `{title}`
+- `{type}`
+- `{artists}`
+- `{language}`
+- `{language_localname}`
 
-## 🛠️如何构建(build)
+示例：
 
-构建非常简单，一共就3条命令  
-~~前提是你已经安装了Rust、Node、pnpm~~
+```text
+{type}/{artists}/[{artists}] {title}({id}) - {language}({language_localname})
+```
 
-#### 📋前提
+## 开发说明
+
+### 技术栈
+
+- 前端：Vue 3、TypeScript、Naive UI、Pinia、UnoCSS
+- 桌面容器：Tauri v2
+- 后端：Rust
+
+### 目录结构
+
+```text
+src/                  Vue 界面、页签、组件、状态管理、多语言
+src/locales/          多语言文案
+src-tauri/src/        Rust 命令、下载逻辑、导出逻辑、配置和 Hitomi 客户端
+src-tauri/resources/  内置资源，例如中文标签翻译词典
+```
+
+### 环境要求
 
 - [Rust](https://www.rust-lang.org/tools/install)
-- [Node](https://nodejs.org/en)
+- [Node.js](https://nodejs.org/)
 - [pnpm](https://pnpm.io/installation)
 
-#### 📝步骤
+### 安装依赖
 
-#### 1. 克隆本仓库
-
-```
+```bash
 git clone https://github.com/lanyeeee/hitomi-downloader.git
-```
-
-#### 2.安装依赖
-
-```
 cd hitomi-downloader
 pnpm install
 ```
 
-#### 3.构建(build)
+### 开发运行
 
+```bash
+pnpm tauri dev
 ```
+
+### 构建
+
+```bash
 pnpm tauri build
 ```
 
-## 🌐 添加新语言
+## 贡献说明
 
-欢迎帮助翻译本项目！如果您想要为项目添加新语言，请参考 [PR #1](https://github.com/lanyeeee/hitomi-downloader/pull/1) 的实现方式。这个PR展示了如何添加`英语(美国)`的本地化文件
+欢迎提交 issue 和 pull request。
 
-添加新语言的主要步骤：
+- 较大的新功能建议先开 issue 或 discussion 讨论
+- 文档改进、Bug 修复、翻译补充、依赖升级都欢迎提交
+- Pull Request 请提交到 `develop` 分支
 
-1. 在 `src/locales` 目录下创建新的语言文件
-2. 参照现有语言文件的格式和键值对进行翻译
-3. 在 `src/locales/index.ts` 中注册新语言
-4. 提交PR
+如果你是从自己的 fork 发起贡献，推荐流程如下：
 
-## 🤝提交PR
+1. 在 GitHub 上 fork 原仓库
+2. 在你的 fork 中创建功能分支
+3. 提交代码改动
+4. 推送到你的 fork
+5. 从你的 fork 向上游仓库的 `develop` 分支发起 Pull Request
 
-**PR请提交至`develop`分支**
+## 说明
 
-**如果想新加一个功能，请先开个`issue`或`discussion`讨论一下，避免无效工作**
+未签名的个人桌面项目有时会遇到杀毒软件误报。如果你介意这一点，可以按上面的步骤自行从源码构建。
 
-其他情况的PR欢迎直接提交，比如：
+## 免责声明
 
-1. 🔧 对原有功能的改进
-2. 🐛 修复BUG
-3. 🌐 添加新的语言支持
-4. ⚡ 使用更轻量的库实现原有功能
-5. 📝 修订文档
-6. ⬆️ 升级、更新依赖的PR也会被接受
+- 本项目仅供学习、研究与交流使用
+- 使用本工具所带来的风险由使用者自行承担
+- 对因不当使用导致的法律问题、损失或第三方纠纷，作者不承担责任
 
-## ⚠️免责声明
+## 致谢
 
-- 本工具仅作学习、研究、交流使用，使用本工具的用户应自行承担风险
-- 作者不对使用本工具导致的任何损失、法律纠纷或其他后果负责
-- 作者不对用户使用本工具的行为负责，包括但不限于用户违反法律或任何第三方权益的行为
-
-## 感谢
-
-[Pupil](https://github.com/tom5079/Pupil)
-
-标签翻译词典引用：
-[scooderic/exhentai-tags-chinese-translation](https://github.com/scooderic/exhentai-tags-chinese-translation)
-
-## 💬其他
-
-任何使用中遇到的问题、任何希望添加的功能，都欢迎提交issue或开discussion交流，我会尽力解决
+- [Pupil](https://github.com/tom5079/Pupil)
+- [scooderic/exhentai-tags-chinese-translation](https://github.com/scooderic/exhentai-tags-chinese-translation)

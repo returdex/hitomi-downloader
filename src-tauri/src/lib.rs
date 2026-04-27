@@ -43,6 +43,8 @@ pub fn run() {
             get_downloaded_comics,
             export_pdf,
             export_cbz,
+            export_all_pdf,
+            export_all_cbz,
             get_search_suggestions,
             get_logs_dir_size,
             show_path_in_file_manager,

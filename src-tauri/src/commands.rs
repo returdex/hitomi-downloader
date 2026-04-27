@@ -3,6 +3,8 @@ use std::path::PathBuf;
 use anyhow::{anyhow, Context};
 use indexmap::IndexMap;
 use parking_lot::RwLock;
+use serde::Serialize;
+use specta::Type;
 use tauri::{AppHandle, State};
 use tauri_plugin_opener::OpenerExt;
 use walkdir::WalkDir;
@@ -18,6 +20,14 @@ use crate::{
     logger,
     types::{Comic, SearchResult},
 };
+
+#[derive(Debug, Clone, Serialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct BatchExportResult {
+    pub exported_count: usize,
+    pub skipped_count: usize,
+    pub failed_count: usize,
+}
 
 #[tauri::command]
 #[specta::specta]
@@ -330,6 +340,114 @@ pub fn export_cbz(app: AppHandle, comic: Comic) -> CommandResult<()> {
     })?;
     tracing::debug!("Exported cbz for comic `{title}` successfully");
     Ok(())
+}
+
+#[tauri::command(async)]
+#[specta::specta]
+#[allow(clippy::needless_pass_by_value)]
+pub fn export_all_pdf(
+    app: AppHandle,
+    comics: Vec<Comic>,
+    skip_existing: bool,
+) -> CommandResult<BatchExportResult> {
+    let mut result = BatchExportResult {
+        exported_count: 0,
+        skipped_count: 0,
+        failed_count: 0,
+    };
+
+    for comic in comics {
+        let title = comic.title.clone();
+
+        if skip_existing
+            && export::archive_exists(&app, &comic, &export::Archive::Pdf).map_err(|err| {
+                CommandError::from(
+                    &format!("Failed to check existing pdf for comic `{title}`"),
+                    err,
+                )
+            })?
+        {
+            result.skipped_count += 1;
+            continue;
+        }
+
+        match export::pdf(&app, &comic) {
+            Ok(()) => {
+                result.exported_count += 1;
+            }
+            Err(err) => {
+                result.failed_count += 1;
+                let string_chain = err.to_string_chain();
+                tracing::error!(
+                    err_title = "Batch export pdf failed",
+                    comic_title = title,
+                    message = string_chain
+                );
+            }
+        }
+    }
+
+    tracing::debug!(
+        exported_count = result.exported_count,
+        skipped_count = result.skipped_count,
+        failed_count = result.failed_count,
+        "Batch exported pdf successfully"
+    );
+    Ok(result)
+}
+
+#[tauri::command(async)]
+#[specta::specta]
+#[allow(clippy::needless_pass_by_value)]
+pub fn export_all_cbz(
+    app: AppHandle,
+    comics: Vec<Comic>,
+    skip_existing: bool,
+) -> CommandResult<BatchExportResult> {
+    let mut result = BatchExportResult {
+        exported_count: 0,
+        skipped_count: 0,
+        failed_count: 0,
+    };
+
+    for comic in comics {
+        let title = comic.title.clone();
+
+        if skip_existing
+            && export::archive_exists(&app, &comic, &export::Archive::Cbz).map_err(|err| {
+                CommandError::from(
+                    &format!("Failed to check existing cbz for comic `{title}`"),
+                    err,
+                )
+            })?
+        {
+            result.skipped_count += 1;
+            continue;
+        }
+
+        match export::cbz(&app, &comic) {
+            Ok(()) => {
+                result.exported_count += 1;
+            }
+            Err(err) => {
+                result.failed_count += 1;
+                let string_chain = err.to_string_chain();
+                tracing::error!(
+                    err_title = "Batch export cbz failed",
+                    comic_title = title,
+                    message = string_chain
+                );
+            }
+        }
+    }
+
+    tracing::debug!(
+        exported_count = result.exported_count,
+        skipped_count = result.skipped_count,
+        failed_count = result.failed_count,
+        "Batch exported cbz successfully"
+    );
+    Ok(result)
 }
 
 #[tauri::command(async)]

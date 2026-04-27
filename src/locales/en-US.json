@@ -84,7 +84,13 @@
     "pdf_exported": "PDF exported",
     "cbz_exporting": "Exporting CBZ",
     "cbz_export_error": "CBZ export failed",
-    "cbz_exported": "CBZ exported"
+    "cbz_exported": "CBZ exported",
+    "export_all_pdf": "Export All PDF",
+    "export_all_cbz": "Export All CBZ",
+    "skip_existing_same_format": "Skip existing PDF/CBZ",
+    "local_count": "{count} local comics",
+    "batch_export_summary": "Done: exported {exported}, skipped {skipped}, failed {failed}",
+    "batch_export_command_error": "Batch export failed to start"
   },
   "comic_pane": {
     "name": "Comic",

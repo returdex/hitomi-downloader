@@ -1,137 +1,156 @@
 <p align="center">
-    <img src="https://github.com/user-attachments/assets/efd0470a-f5cb-4c1d-a0c3-3f5c39113933" style="align-self: center"/>
+  <img src="https://github.com/user-attachments/assets/efd0470a-f5cb-4c1d-a0c3-3f5c39113933" alt="Hitomi Downloader banner" />
 </p>
 
+# Hitomi Downloader
 
-# 📚 Hitomi Downloader
+A desktop downloader for `hitomi.la` built with Tauri, Vue 3, and Rust.
 
-A GUI-based multi-threaded downloader for hitomi hitomi.la
+[简体中文](./README.zh-CN.md)
 
-English / [简体中文](./README.zh-CN.md)
+## Overview
 
-## 📥 Download
+Hitomi Downloader provides a GUI workflow for searching comics, downloading galleries with multiple concurrent tasks, browsing local downloads, and exporting downloaded content to archive formats that are easier to read or manage offline.
 
-Pre-compiled packages are available on the [Releases page](https://github.com/lanyeeee/hitomi-downloader/releases). Just download and use.
+The current codebase includes:
 
-**Enjoying this project? feel free to support it with a GitHub Star⭐! Your support motivates me to keep updating and maintaining🙏**
+- Search by keyword or comic ID / URL
+- Multi-task download management with pause, resume, cancel, and progress tracking
+- Local library browsing for downloaded comics
+- Single-comic export to PDF or CBZ
+- Batch export of all local comics to PDF or CBZ
+- Optional skipping of files that have already been exported in the same format
+- CBZ `ComicInfo.xml` tag translation when the UI language is `zh-CN`
+- Configurable download/export directories, directory naming rules, and proxy settings
+- Built-in i18n support
 
-## ✨ Features
+## Screenshots
 
-| Feature                            | Description                                                  |
-| ---------------------------------- | ------------------------------------------------------------ |
-| 🖼️ GUI                              | Built with [Tauri](https://v2.tauri.app/start/), lightweight, clean, and easy to use. |
-| ⚡ Multi-threaded Downloading       | Maximize download speed.                                     |
-| 📂 Export                           | One-click export to universal PDF or CBZ formats. When the UI language is set to `zh-CN`, CBZ export translates tags in `ComicInfo.xml` to Chinese. |
-| 🌐 Internationalization             | Built-in multi-language support system (i18n).               |
-| 🗂️ Customizable Directory Structure | Highly customizable directory structure and naming rules, supporting fields like type, author, language, etc. Say goodbye to the hassle of manual organization. |
+![Search and details](https://github.com/user-attachments/assets/fd93fd2f-db16-43b6-86cf-aa643eb572c8)
+![Downloads and local library](https://github.com/user-attachments/assets/81a859f2-2a06-4eca-b45f-4f6555cc62c0)
 
-## 🖥️ GUI
+## How To Use
 
-![image](https://github.com/user-attachments/assets/fd93fd2f-db16-43b6-86cf-aa643eb572c8)
-![image](https://github.com/user-attachments/assets/81a859f2-2a06-4eca-b45f-4f6555cc62c0)
+1. Open the `Search` tab and search by keyword, comic ID, or `hitomi.la` URL.
+2. Start a download from the card list, or open the `Comic` tab for detailed information before downloading.
+3. Monitor active tasks in the download panel on the right.
+4. Open the `Local` tab to review downloaded comics and export them when needed.
 
+### Exporting Local Comics
 
-## 📖 How to Use
+The `Local` tab supports both per-comic export and batch export:
 
-1.  In `Search` tab search for keywords.
-2.  Click the `Download` button directly on the comic card, or click the cover/title to go to the `Comic` tab, where you'll also find a `Download` button.
-3.  After downloading, click the `Open Folder` button to check the results.
+- `Export PDF`: export one comic as a PDF
+- `Export CBZ`: export one comic as a CBZ archive
+- `Export All PDF`: export all detected local comics as PDF
+- `Export All CBZ`: export all detected local comics as CBZ
+- `Skip existing PDF/CBZ`: skip items whose target archive already exists
 
-**By the way, you can export to PDF/CBZ(ZIP) in the `Local` tab.**
+Batch export shows a final summary with exported, skipped, and failed counts. The skip option is remembered locally for later sessions.
 
-### Tag Translation in CBZ Export
+### CBZ Tag Translation
 
-When the interface language is set to `zh-CN`, the app translates comic tags written to `ComicInfo.xml` during CBZ export.
+When the UI language is set to `zh-CN`, the app translates comic tags written into `ComicInfo.xml` during CBZ export.
 
-- Only CBZ metadata tags are translated. Internal app metadata and search tags remain unchanged.
-- Unknown or unmapped tags fall back to the original tag text.
-- The translation dictionary is based on [scooderic/exhentai-tags-chinese-translation](https://github.com/scooderic/exhentai-tags-chinese-translation), using [`dist/ehtags-cn.json`](https://raw.githubusercontent.com/scooderic/exhentai-tags-chinese-translation/master/dist/ehtags-cn.json).
+- Only exported CBZ metadata is translated
+- Search data and in-app source metadata stay unchanged
+- Unknown tags fall back to the original text
 
-📹 The video below demonstrates the full usage process. **It's Safe For Work, so feel free to watch.**
+The translation dictionary is based on [scooderic/exhentai-tags-chinese-translation](https://github.com/scooderic/exhentai-tags-chinese-translation).
 
-https://github.com/user-attachments/assets/d2d0e577-c074-41ca-996f-445d52e2cce5
+## Configuration
 
+The app can be configured from the settings dialog:
 
+- Download image format: `webp` or `avif`
+- Proxy mode: system, direct, or custom host/port
+- Download directory
+- Export directory
+- Directory naming template, with placeholders such as:
+  - `{id}`
+  - `{title}`
+  - `{type}`
+  - `{artists}`
+  - `{language}`
+  - `{language_localname}`
 
-## ⚠️ About Antivirus False Positives
+Example directory template:
 
-For individually developed projects, this issue is almost unavoidable (~~because it requires purchasing a digital certificate for software signing, or even paying protection fees to antivirus companies~~).
-The only solutions I can think of are:
-
-1.  Compile it yourself according to the **How to Build** instructions below.
-2.  Trust my promise that everything you download from the [Release page](https://github.com/lanyeeee/hitomi-downloader/releases) is safe.
-
-## 🛠️ How to Build
-
-Building is very simple, just 3 commands.
-~~Prerequisite you have Rust, Node, and pnpm installed.~~
-
-#### 📋 Prerequisites
-
--   [Rust](https://www.rust-lang.org/tools/install)
--   [Node](https://nodejs.org/en)
--   [pnpm](https://pnpm.io/installation)
-
-#### 📝 Steps
-
-#### 1. Clone this repository
-
+```text
+{type}/{artists}/[{artists}] {title}({id}) - {language}({language_localname})
 ```
+
+## Development
+
+### Tech Stack
+
+- Frontend: Vue 3, TypeScript, Naive UI, Pinia, UnoCSS
+- Desktop shell: Tauri v2
+- Backend: Rust
+
+### Project Structure
+
+```text
+src/              Vue UI, panes, components, stores, i18n
+src/locales/      Locale files
+src-tauri/src/    Rust commands, downloader, export, config, and Hitomi client logic
+src-tauri/resources/
+                  Embedded resources such as the zh-CN tag dictionary
+```
+
+### Prerequisites
+
+- [Rust](https://www.rust-lang.org/tools/install)
+- [Node.js](https://nodejs.org/)
+- [pnpm](https://pnpm.io/installation)
+
+### Install
+
+```bash
 git clone https://github.com/lanyeeee/hitomi-downloader.git
-```
-
-#### 2. Install dependencies
-
-```
 cd hitomi-downloader
 pnpm install
 ```
 
-#### 3. Build
+### Run In Development
 
+```bash
+pnpm tauri dev
 ```
+
+### Build
+
+```bash
 pnpm tauri build
 ```
 
-## 🌐 Adding a New Language
+## Contributing
 
-Help with translating this project is welcome! If you want to add a new language, please refer to the implementation in [PR #1](https://github.com/lanyeeee/hitomi-downloader/pull/1). This PR shows how to add the localization files for `en-us`.
+Issues and pull requests are welcome.
 
-Main steps for adding a new language:
+- For larger feature ideas, open an issue or discussion first
+- Documentation improvements, bug fixes, localization work, and dependency maintenance are all welcome
+- Please submit pull requests against the `develop` branch
 
-1.  Create a new language file in the `src/locales` directory.
-2.  Translate the key-value pairs, following the format of the existing language files.
-3.  Register the new language in `src/locales/index.ts`.
-4.  Submit a PR.
+If you are contributing from a fork, a typical flow is:
 
-## 🤝 Submitting PR
+1. Fork the repository on GitHub
+2. Create a feature branch in your fork
+3. Commit your changes
+4. Push the branch to your fork
+5. Open a pull request from your fork to the upstream `develop` branch
 
-**Please submit Pull Requests to the `develop` branch.**
+## Notes
 
-**If you want to add a new feature, please open an `issue` or `discussion` first to talk about it. This helps avoid wasted effort.**
+False-positive antivirus reports can happen for small unsigned desktop projects. If needed, you can build the application locally from source using the steps above.
 
-For other cases, feel free to submit a PR directly, for example:
+## Disclaimer
 
-1.  🔧 Improvements to existing features.
-2.  🐛 Bug fixes.
-3.  🌐 Adding new language support.
-4.  ⚡ Using a more lightweight library to implement existing features.
-5.  📝 Documentation revisions.
-6.  ⬆️  Pull Request for upgrading/updating dependencies will also be accepted.
+- This project is intended for learning, research, and communication purposes only
+- Users are responsible for their own use of the software
+- The author is not responsible for legal issues, losses, or third-party disputes caused by misuse
 
-## ⚠️ Disclaimer
+## Credits
 
--   This tool is intended for learning, research, and communication purposes only. Users should assume all risks associated with its use.
--   The author is not responsible for any losses, legal disputes, or other consequences resulting from the use of this tool.
--   The author is not responsible for the user's actions while using this tool, including but not limited to actions that violate laws or the rights of any third party.
-
-## Thanks
-
-[Pupil](https://github.com/tom5079/Pupil)
-
-Tag translation dictionary reference:
-[scooderic/exhentai-tags-chinese-translation](https://github.com/scooderic/exhentai-tags-chinese-translation)
-
-## 💬 Other
-
-Any problems encountered during use or any features you would like to add, welcome to open a `issue` or `discussion`. I will do my best to address them.
+- [Pupil](https://github.com/tom5079/Pupil)
+- [scooderic/exhentai-tags-chinese-translation](https://github.com/scooderic/exhentai-tags-chinese-translation)

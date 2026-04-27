@@ -18,7 +18,7 @@ use crate::{
     types::{Comic, ComicInfo},
 };
 
-enum Archive {
+pub enum Archive {
     Cbz,
     Pdf,
 }
@@ -29,6 +29,25 @@ impl Archive {
             Archive::Pdf => "pdf",
         }
     }
+}
+
+pub fn get_archive_path(
+    app: &AppHandle,
+    comic: &Comic,
+    archive: &Archive,
+) -> anyhow::Result<PathBuf> {
+    let export_dir = comic
+        .get_comic_export_dir(app)
+        .context("Failed to get comic export directory")?;
+    let download_dir_name = comic
+        .get_comic_download_dir_name()
+        .context("Failed to get comic download directory name")?;
+
+    Ok(export_dir.join(format!("{download_dir_name}.{}", archive.extension())))
+}
+
+pub fn archive_exists(app: &AppHandle, comic: &Comic, archive: &Archive) -> anyhow::Result<bool> {
+    Ok(get_archive_path(app, comic, archive)?.exists())
 }
 
 struct CbzEventGuard {
@@ -83,7 +102,8 @@ pub fn cbz(app: &AppHandle, comic: &Comic) -> anyhow::Result<()> {
         .get_comic_export_dir(app)
         .context("Failed to get comic export directory")?;
     // Generate ComicInfo
-    let ui_locale = app.state::<parking_lot::RwLock<crate::config::Config>>()
+    let ui_locale = app
+        .state::<parking_lot::RwLock<crate::config::Config>>()
         .read()
         .ui_locale
         .clone();
@@ -99,11 +119,7 @@ pub fn cbz(app: &AppHandle, comic: &Comic) -> anyhow::Result<()> {
         export_dir.display()
     ))?;
     // Create cbz file
-    let extension = Archive::Cbz.extension();
-    let download_dir_name = &comic
-        .get_comic_download_dir_name()
-        .context("Failed to get comic download directory name")?;
-    let zip_path = export_dir.join(format!("{download_dir_name}.{extension}"));
+    let zip_path = get_archive_path(app, comic, &Archive::Cbz)?;
     let zip_file = std::fs::File::create(&zip_path).context(format!(
         "`{comic_title}` failed to create file `{}`",
         zip_path.display()
@@ -207,11 +223,7 @@ pub fn pdf(app: &AppHandle, comic: &Comic) -> anyhow::Result<()> {
         export_dir.display()
     ))?;
     // Create PDF
-    let extension = Archive::Pdf.extension();
-    let download_dir_name = &comic
-        .get_comic_download_dir_name()
-        .context("Failed to get comic download directory name")?;
-    let pdf_path = export_dir.join(format!("{download_dir_name}.{extension}"));
+    let pdf_path = get_archive_path(app, comic, &Archive::Pdf)?;
     create_pdf(download_dir, &pdf_path).context("Failed to create PDF")?;
     // Set success to true to ensure that the end event is sent
     pdf_event_guard.success = true;

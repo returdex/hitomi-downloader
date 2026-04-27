@@ -40,8 +40,8 @@ fn translations() -> anyhow::Result<&'static HashMap<String, String>> {
 }
 
 fn load_translations() -> anyhow::Result<HashMap<String, String>> {
-    let entries: Vec<TagTranslationEntry> =
-        serde_json::from_str(ZH_CN_DICT).context("Failed to parse embedded zh-CN tag dictionary")?;
+    let entries: Vec<TagTranslationEntry> = serde_json::from_str(ZH_CN_DICT)
+        .context("Failed to parse embedded zh-CN tag dictionary")?;
 
     Ok(entries
         .into_iter()
