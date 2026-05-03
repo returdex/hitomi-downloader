@@ -1,8 +1,9 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, time::Duration};
 
 use anyhow::{anyhow, Context};
 use indexmap::IndexMap;
 use parking_lot::RwLock;
+use regex_lite::Regex;
 use serde::Serialize;
 use specta::Type;
 use tauri::{AppHandle, State};
@@ -27,6 +28,15 @@ pub struct BatchExportResult {
     pub exported_count: usize,
     pub skipped_count: usize,
     pub failed_count: usize,
+}
+
+#[derive(Debug, Clone, Serialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct EhentaiFavoritesImportResult {
+    pub found_count: usize,
+    pub queued_count: usize,
+    pub failed_count: usize,
+    pub failed_ids: Vec<i32>,
 }
 
 #[tauri::command]
@@ -151,6 +161,136 @@ pub fn create_download_task(
         })?;
     tracing::debug!("Created download task with ID `{id}` successfully");
     Ok(())
+}
+
+#[tauri::command(async)]
+#[specta::specta]
+pub async fn import_ehentai_favorites(
+    hitomi_client: State<'_, HitomiClient>,
+    download_manager: State<'_, DownloadManager>,
+    cookie: String,
+    favorites_url: String,
+    download_dir: PathBuf,
+    limit: Option<usize>,
+) -> CommandResult<EhentaiFavoritesImportResult> {
+    let cookie = cookie.trim();
+    if cookie.is_empty() {
+        return Err(CommandError::from(
+            "E-Hentai cookie is empty",
+            anyhow!("Cookie is required"),
+        ));
+    }
+    if !favorites_url.starts_with("https://e-hentai.org/")
+        && !favorites_url.starts_with("https://exhentai.org/")
+    {
+        return Err(CommandError::from(
+            "Invalid E-Hentai favorites URL",
+            anyhow!("URL must start with https://e-hentai.org/ or https://exhentai.org/"),
+        ));
+    }
+    if download_dir.as_os_str().is_empty() {
+        return Err(CommandError::from(
+            "Download folder is empty",
+            anyhow!("A target download folder is required"),
+        ));
+    }
+
+    let html = reqwest::ClientBuilder::new()
+        .timeout(Duration::from_secs(10))
+        .build()
+        .map_err(|err| CommandError::from("Failed to create E-Hentai client", err))?
+        .get(&favorites_url)
+        .header(reqwest::header::COOKIE, cookie)
+        .header(reqwest::header::USER_AGENT, "hitomi-downloader")
+        .send()
+        .await
+        .context("Failed to request E-Hentai favorites page")
+        .and_then(|resp| {
+            let status = resp.status();
+            if status.is_success() {
+                Ok(resp)
+            } else {
+                Err(anyhow!("Unexpected E-Hentai response status: {status}"))
+            }
+        })
+        .map_err(|err| CommandError::from("Failed to load E-Hentai favorites", err))?
+        .text()
+        .await
+        .map_err(|err| CommandError::from("Failed to read E-Hentai favorites", err))?;
+
+    let gallery_ids = parse_ehentai_gallery_ids(&html, limit)
+        .map_err(|err| CommandError::from("Failed to parse E-Hentai favorites", err))?;
+
+    let mut result = EhentaiFavoritesImportResult {
+        found_count: gallery_ids.len(),
+        queued_count: 0,
+        failed_count: 0,
+        failed_ids: Vec::new(),
+    };
+
+    for id in gallery_ids {
+        match hitomi_client.get_comic(id).await {
+            Ok(comic) => {
+                if let Err(err) = download_manager
+                    .create_download_task_with_base_dir(comic, Some(download_dir.clone()))
+                {
+                    result.failed_count += 1;
+                    result.failed_ids.push(id);
+                    let string_chain = err.to_string_chain();
+                    tracing::error!(
+                        err_title = "Failed to queue E-Hentai favorite download",
+                        gallery_id = id,
+                        message = string_chain
+                    );
+                } else {
+                    result.queued_count += 1;
+                }
+            }
+            Err(err) => {
+                result.failed_count += 1;
+                result.failed_ids.push(id);
+                let string_chain = err.to_string_chain();
+                tracing::error!(
+                    err_title = "Failed to find favorite on Hitomi",
+                    gallery_id = id,
+                    message = string_chain
+                );
+            }
+        }
+    }
+
+    tracing::debug!(
+        found_count = result.found_count,
+        queued_count = result.queued_count,
+        failed_count = result.failed_count,
+        "import E-Hentai favorites success"
+    );
+    Ok(result)
+}
+
+fn parse_ehentai_gallery_ids(html: &str, limit: Option<usize>) -> anyhow::Result<Vec<i32>> {
+    let gallery_link_regex =
+        Regex::new(r"(?:https?://(?:e-|ex)hentai\.org)?/g/(\d+)/[A-Za-z0-9]+/?")?;
+    let mut ids = Vec::new();
+
+    for captures in gallery_link_regex.captures_iter(html) {
+        let Some(gallery_id) = captures.get(1) else {
+            continue;
+        };
+        let id = gallery_id
+            .as_str()
+            .parse::<i32>()
+            .context("Failed to parse E-Hentai gallery id")?;
+        if ids.contains(&id) {
+            continue;
+        }
+        ids.push(id);
+        if limit.is_some_and(|limit| ids.len() >= limit) {
+            break;
+        }
+    }
+
+    Ok(ids)
 }
 
 #[allow(clippy::needless_pass_by_value)]

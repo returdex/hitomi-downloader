@@ -51,6 +51,14 @@ async createDownloadTask(comic: Comic) : Promise<Result<null, CommandError>> {
     else return { status: "error", error: e  as any };
 }
 },
+async importEhentaiFavorites(cookie: string, favoritesUrl: string, downloadDir: string, limit?: number | null) : Promise<Result<EhentaiFavoritesImportResult, CommandError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("import_ehentai_favorites", { cookie, favoritesUrl, downloadDir, limit }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
 async pauseDownloadTask(id: number) : Promise<Result<null, CommandError>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("pause_download_task", { id }) };
@@ -166,6 +174,7 @@ export type DownloadFormat = "Webp" | "Avif"
 export type DownloadSpeedEvent = { speed: string }
 export type DownloadTaskEvent = { event: "Create"; data: { state: DownloadTaskState; comic: Comic; downloadedImgCount: number; totalImgCount: number } } | { event: "Update"; data: { comicId: number; state: DownloadTaskState; downloadedImgCount: number; totalImgCount: number } }
 export type DownloadTaskState = "Pending" | "Downloading" | "Paused" | "Cancelled" | "Completed" | "Failed"
+export type EhentaiFavoritesImportResult = { foundCount: number; queuedCount: number; failedCount: number; failedIds: number[] }
 export type ExportCbzEvent = { event: "Start"; data: { uuid: string; title: string } } | { event: "Error"; data: { uuid: string } } | { event: "End"; data: { uuid: string } }
 export type ExportPdfEvent = { event: "Start"; data: { uuid: string; title: string } } | { event: "Error"; data: { uuid: string } } | { event: "End"; data: { uuid: string } }
 export type GalleryFiles = { width: number; hash: string; haswebp?: number; hasavif?: number; hasjxl?: number; name: string; height: number }

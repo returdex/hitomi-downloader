@@ -74,7 +74,15 @@
     "searching_warning": "当前正在搜索，请稍后再试",
     "search_success": "搜索完成",
     "comic_id_invalid": "漫画 ID 格式错误",
-    "enter_comic_id_or_url": "请输入漫画 ID 或链接"
+    "enter_comic_id_or_url": "请输入漫画 ID 或链接",
+    "ehentai_favorites": "E-Hentai 收藏",
+    "ehentai_cookie": "Cookie",
+    "ehentai_favorites_url": "收藏页 URL",
+    "ehentai_limit": "数量",
+    "ehentai_import": "搜索并下载",
+    "ehentai_import_invalid": "Cookie、URL 和文件夹不能为空",
+    "ehentai_import_done": "收藏已加入下载",
+    "ehentai_import_summary": "找到 {found}，加入 {queued}，失败 {failed}"
   },
   "downloaded_pane": {
     "name": "本地库存",

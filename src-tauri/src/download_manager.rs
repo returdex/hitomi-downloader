@@ -73,6 +73,14 @@ impl DownloadManager {
     }
 
     pub fn create_download_task(&self, comic: Comic) -> anyhow::Result<()> {
+        self.create_download_task_with_base_dir(comic, None)
+    }
+
+    pub fn create_download_task_with_base_dir(
+        &self,
+        comic: Comic,
+        download_dir_override: Option<PathBuf>,
+    ) -> anyhow::Result<()> {
         use DownloadTaskState::{Downloading, Paused, Pending};
         let id = comic.id;
         let mut tasks = self.download_tasks.write();
@@ -83,7 +91,7 @@ impl DownloadManager {
                 return Ok(());
             }
         }
-        let task = DownloadTask::new(self.app.clone(), comic)
+        let task = DownloadTask::new(self.app.clone(), comic, download_dir_override)
             .context(format!("Failed to create download task with id `{id}`",))?;
         tauri::async_runtime::spawn(task.clone().process());
         tasks.insert(id, task);
@@ -110,15 +118,18 @@ impl DownloadManager {
 
             if matches!(task_state, Failed | Cancelled | Completed) {
                 // If the task state is `Failed`, `Cancelled`, or `Completed`, get the comic to recreate the download task
-                Some(task.comic.as_ref().clone())
+                Some((
+                    task.comic.as_ref().clone(),
+                    task.download_dir_override.clone(),
+                ))
             } else {
                 task.set_state(Pending);
                 None
             }
         };
         // If comic is not None, recreate the download task
-        if let Some(comic) = comic {
-            self.create_download_task(comic)
+        if let Some((comic, download_dir_override)) = comic {
+            self.create_download_task_with_base_dir(comic, download_dir_override)
                 .context(format!("Failed to recreate download task with id `{id}`"))?;
         }
         Ok(())
@@ -157,14 +168,21 @@ struct DownloadTask {
     downloaded_img_count: Arc<AtomicU32>,
     total_img_count: Arc<AtomicU32>,
     download_format: DownloadFormat,
+    download_dir_override: Option<PathBuf>,
 }
 
 impl DownloadTask {
-    pub fn new(app: AppHandle, mut comic: Comic) -> anyhow::Result<Self> {
-        comic.update_dir_name_fields_by_fmt(&app).context(format!(
-            "Failed to update directory name fields by fmt of `{}`",
-            comic.title
-        ))?;
+    pub fn new(
+        app: AppHandle,
+        mut comic: Comic,
+        download_dir_override: Option<PathBuf>,
+    ) -> anyhow::Result<Self> {
+        comic
+            .update_dir_name_fields_by_fmt(&app, download_dir_override.as_deref())
+            .context(format!(
+                "Failed to update directory name fields by fmt of `{}`",
+                comic.title
+            ))?;
 
         let download_manager = app.state::<DownloadManager>().inner().clone();
         let (state_sender, _) = watch::channel(DownloadTaskState::Pending);
@@ -178,6 +196,7 @@ impl DownloadTask {
             downloaded_img_count: Arc::new(AtomicU32::new(0)),
             total_img_count: Arc::new(AtomicU32::new(0)),
             download_format,
+            download_dir_override,
         };
 
         Ok(task)
@@ -765,7 +784,11 @@ pub struct DirFmtParams {
 
 impl Comic {
     /// Update the `comic_download_dir` fields based on the fmt
-    fn update_dir_name_fields_by_fmt(&mut self, app: &AppHandle) -> anyhow::Result<()> {
+    fn update_dir_name_fields_by_fmt(
+        &mut self,
+        app: &AppHandle,
+        download_dir_override: Option<&Path>,
+    ) -> anyhow::Result<()> {
         let comic_title = &self.title;
 
         let fmt_params = DirFmtParams {
@@ -776,9 +799,10 @@ impl Comic {
             type_field: self.type_field.clone(),
             artists: self.artists.join(", "),
         };
-        let comic_download_dir = Comic::get_comic_download_dir_by_fmt(app, &fmt_params).context(
-            format!("Failed to get download directory by fmt of `{comic_title}`"),
-        )?;
+        let comic_download_dir =
+            Comic::get_comic_download_dir_by_fmt(app, &fmt_params, download_dir_override).context(
+                format!("Failed to get download directory by fmt of `{comic_title}`"),
+            )?;
         self.comic_download_dir = Some(comic_download_dir);
 
         Ok(())
@@ -787,6 +811,7 @@ impl Comic {
     fn get_comic_download_dir_by_fmt(
         app: &AppHandle,
         fmt_params: &DirFmtParams,
+        download_dir_override: Option<&Path>,
     ) -> anyhow::Result<PathBuf> {
         use strfmt::strfmt;
 
@@ -809,11 +834,14 @@ impl Comic {
             })
             .collect();
 
-        let (download_dir, dir_fmt) = {
+        let (configured_download_dir, dir_fmt) = {
             let config = app.state::<RwLock<Config>>();
             let config = config.read();
             (config.download_dir.clone(), config.dir_fmt.clone())
         };
+        let download_dir = download_dir_override
+            .map(Path::to_path_buf)
+            .unwrap_or(configured_download_dir);
 
         let dir_fmt_parts: Vec<&str> = dir_fmt.split('/').collect();
 

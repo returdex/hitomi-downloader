@@ -2,10 +2,11 @@
 import { computed, nextTick, ref, watch } from 'vue'
 import { commands, Suggestion } from '../bindings.ts'
 import { SelectOption, useMessage, useNotification } from 'naive-ui'
+import { open } from '@tauri-apps/plugin-dialog'
 import ComicCard from '../components/ComicCard.vue'
 import { useStore } from '../store.ts'
 import { useI18n } from '../utils.ts'
-import { PhMagnifyingGlass, PhArrowRight } from '@phosphor-icons/vue'
+import { PhMagnifyingGlass, PhArrowRight, PhFolderOpen } from '@phosphor-icons/vue'
 import FloatLabelInput from '../components/FloatLabelInput.vue'
 
 const { t } = useI18n()
@@ -18,6 +19,10 @@ const notification = useNotification()
 const searchInput = ref<string>('')
 const searchInputRef = ref<InstanceType<typeof FloatLabelInput>>()
 const comicIdInput = ref<string>('')
+const ehentaiCookie = ref<string>('')
+const ehentaiFavoritesUrl = ref<string>('https://e-hentai.org/favorites.php')
+const ehentaiDownloadDir = ref<string>(store.config?.downloadDir ?? '')
+const ehentaiImportLimit = ref<number | null>(25)
 const currentPage = ref<number>(1)
 const comicCardContainerRef = ref<HTMLElement>()
 const {
@@ -31,6 +36,7 @@ const {
 } = useSuggestion()
 
 const searching = ref<boolean>(false)
+const importingEhentaiFavorites = ref<boolean>(false)
 
 watch(
   () => store.searchResult,
@@ -115,6 +121,50 @@ async function pickComic() {
 
   store.pickedComic = result.data
   store.currentTabName = 'comic'
+}
+
+async function selectEhentaiDownloadDir() {
+  const selectedDirPath = await open({ directory: true })
+  if (selectedDirPath === null) {
+    return
+  }
+  ehentaiDownloadDir.value = selectedDirPath
+}
+
+async function importEhentaiFavorites() {
+  if (importingEhentaiFavorites.value) {
+    return
+  }
+  if (ehentaiCookie.value.trim() === '' || ehentaiFavoritesUrl.value.trim() === '' || ehentaiDownloadDir.value === '') {
+    notification.error({
+      title: () => t('search_pane.ehentai_import_invalid'),
+    })
+    return
+  }
+
+  importingEhentaiFavorites.value = true
+  const result = await commands.importEhentaiFavorites(
+    ehentaiCookie.value,
+    ehentaiFavoritesUrl.value.trim(),
+    ehentaiDownloadDir.value,
+    ehentaiImportLimit.value === null ? undefined : ehentaiImportLimit.value,
+  )
+  importingEhentaiFavorites.value = false
+
+  if (result.status === 'error') {
+    console.error(result.error)
+    notification.error({
+      title: () => result.error.err_title,
+      description: () => result.error.err_message,
+    })
+    return
+  }
+
+  const { foundCount, queuedCount, failedCount } = result.data
+  notification.success({
+    title: () => t('search_pane.ehentai_import_done'),
+    description: () => t('search_pane.ehentai_import_summary', { found: foundCount, queued: queuedCount, failed: failedCount }),
+  })
 }
 
 function handleSearchInputKeydown(e: KeyboardEvent) {
@@ -273,6 +323,51 @@ defineExpose({ search })
         </template>
       </n-button>
     </n-input-group>
+
+    <n-collapse class="box-border px-2">
+      <n-collapse-item :title="t('search_pane.ehentai_favorites')" name="ehentai-favorites">
+        <div class="flex flex-col gap-2">
+          <FloatLabelInput
+            :label="t('search_pane.ehentai_cookie')"
+            type="password"
+            size="small"
+            v-model:value="ehentaiCookie"
+            clearable />
+          <FloatLabelInput
+            :label="t('search_pane.ehentai_favorites_url')"
+            size="small"
+            v-model:value="ehentaiFavoritesUrl"
+            clearable />
+          <n-input-group>
+            <n-input-group-label size="small">{{ t('common.download_directory') }}</n-input-group-label>
+            <n-input v-model:value="ehentaiDownloadDir" size="small" readonly @click="selectEhentaiDownloadDir" />
+            <n-button class="w-9" size="small" @click="selectEhentaiDownloadDir">
+              <template #icon>
+                <n-icon size="20">
+                  <PhFolderOpen />
+                </n-icon>
+              </template>
+            </n-button>
+          </n-input-group>
+          <div class="flex gap-2">
+            <n-input-number
+              class="w-32"
+              v-model:value="ehentaiImportLimit"
+              size="small"
+              :min="1"
+              :placeholder="t('search_pane.ehentai_limit')" />
+            <n-button
+              type="primary"
+              class="ml-auto"
+              size="small"
+              :loading="importingEhentaiFavorites"
+              @click="importEhentaiFavorites">
+              {{ t('search_pane.ehentai_import') }}
+            </n-button>
+          </div>
+        </div>
+      </n-collapse-item>
+    </n-collapse>
 
     <div
       v-if="store.searchResult !== undefined"

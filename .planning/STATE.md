@@ -1,6 +1,6 @@
 # Project State
 
-Last activity: 2026-05-04 - Started GSD tracking and completed quick task 260504-001: Clean ComicPane debug leftovers
+Last activity: 2026-05-04 - Completed quick task 260504-002: Add E-Hentai favorites import download flow
 
 ## Current Focus
 
@@ -15,3 +15,4 @@ Stabilization for the existing Tauri/Vue app.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260504-001 | Clean ComicPane debug leftovers | 2026-05-04 | this commit | [260504-001-clean-comicpane-debug-leftovers](./quick/260504-001-clean-comicpane-debug-leftovers/) |
+| 260504-002 | Add E-Hentai favorites import download flow | 2026-05-04 | this commit | [260504-002-ehentai-favorites-import](./quick/260504-002-ehentai-favorites-import/) |
