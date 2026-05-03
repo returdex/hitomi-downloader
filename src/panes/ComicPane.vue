@@ -28,9 +28,7 @@ watch(
     if (store.pickedComic === undefined) {
       return
     }
-    console.log(containerRef.value)
     if (containerRef.value !== undefined) {
-      console.log('scrollTo')
       nextTick(() => containerRef.value?.scrollTo({ top: 0, behavior: 'instant' }))
     }
 
@@ -52,7 +50,6 @@ async function pickComic(id: number) {
 }
 
 async function reloadRelatedComics() {
-  console.log('reloadRelatedComics')
   if (store.pickedComic === undefined) {
     return
   }
@@ -224,7 +221,7 @@ async function showComicDownloadDirInFileManager() {
             v-for="({ tag, female, male }, index) in store.pickedComic.tags"
             :key="index"
             round
-            class="hover:scale-110 transition-transform duration-100'"
+            class="hover:scale-110 transition-transform duration-100"
             :color="female !== 0 ? '#F472B6' : male !== 0 ? '#60A5FA' : undefined"
             size="tiny"
             @click="search(`${female !== 0 ? 'female' : male !== 0 ? 'male' : 'tag'}:${tag.replace(' ', '_')}`, 1)">
