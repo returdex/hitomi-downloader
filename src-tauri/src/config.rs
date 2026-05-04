@@ -18,6 +18,12 @@ pub struct Config {
     pub proxy_host: String,
     pub proxy_mode: ProxyMode,
     pub proxy_port: u16,
+    pub ehentai_cookie: String,
+    pub ehentai_favorites_url: String,
+    pub ehentai_favorites_download_dir: PathBuf,
+    pub ehentai_favorites_limit: Option<usize>,
+    pub ehentai_favorites_auto_check: bool,
+    pub ehentai_favorites_known_ids: Vec<i32>,
 }
 
 impl Config {
@@ -83,6 +89,12 @@ impl Config {
             proxy_mode: ProxyMode::System,
             proxy_host: "127.0.0.1".to_string(),
             proxy_port: 7890,
+            ehentai_cookie: String::new(),
+            ehentai_favorites_url: "https://e-hentai.org/favorites.php".to_string(),
+            ehentai_favorites_download_dir: app_data_dir.join("download"),
+            ehentai_favorites_limit: Some(25),
+            ehentai_favorites_auto_check: false,
+            ehentai_favorites_known_ids: Vec::new(),
         }
     }
 }

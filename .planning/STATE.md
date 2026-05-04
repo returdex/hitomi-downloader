@@ -1,6 +1,6 @@
 # Project State
 
-Last activity: 2026-05-04 - Completed quick task 260504-002: Add E-Hentai favorites import download flow
+Last activity: 2026-05-04 - Completed quick task 260504-003: Persist E-Hentai cookie and auto-check favorites
 
 ## Current Focus
 
@@ -16,3 +16,4 @@ Stabilization for the existing Tauri/Vue app.
 |---|-------------|------|--------|-----------|
 | 260504-001 | Clean ComicPane debug leftovers | 2026-05-04 | this commit | [260504-001-clean-comicpane-debug-leftovers](./quick/260504-001-clean-comicpane-debug-leftovers/) |
 | 260504-002 | Add E-Hentai favorites import download flow | 2026-05-04 | this commit | [260504-002-ehentai-favorites-import](./quick/260504-002-ehentai-favorites-import/) |
+| 260504-003 | Persist E-Hentai cookie and auto-check favorites | 2026-05-04 | this commit | [260504-003-persist-ehentai-cookie-auto-check](./quick/260504-003-persist-ehentai-cookie-auto-check/) |

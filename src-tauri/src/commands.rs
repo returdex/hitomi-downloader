@@ -34,9 +34,11 @@ pub struct BatchExportResult {
 #[serde(rename_all = "camelCase")]
 pub struct EhentaiFavoritesImportResult {
     pub found_count: usize,
+    pub skipped_known_count: usize,
     pub queued_count: usize,
     pub failed_count: usize,
     pub failed_ids: Vec<i32>,
+    pub found_ids: Vec<i32>,
 }
 
 #[tauri::command]
@@ -172,6 +174,8 @@ pub async fn import_ehentai_favorites(
     favorites_url: String,
     download_dir: PathBuf,
     limit: Option<usize>,
+    known_ids: Vec<i32>,
+    download_known: bool,
 ) -> CommandResult<EhentaiFavoritesImportResult> {
     let cookie = cookie.trim();
     if cookie.is_empty() {
@@ -221,14 +225,26 @@ pub async fn import_ehentai_favorites(
     let gallery_ids = parse_ehentai_gallery_ids(&html, limit)
         .map_err(|err| CommandError::from("Failed to parse E-Hentai favorites", err))?;
 
+    let ids_to_download = if download_known {
+        gallery_ids.clone()
+    } else {
+        gallery_ids
+            .iter()
+            .copied()
+            .filter(|id| !known_ids.contains(id))
+            .collect()
+    };
+
     let mut result = EhentaiFavoritesImportResult {
         found_count: gallery_ids.len(),
+        skipped_known_count: gallery_ids.len().saturating_sub(ids_to_download.len()),
         queued_count: 0,
         failed_count: 0,
         failed_ids: Vec::new(),
+        found_ids: gallery_ids,
     };
 
-    for id in gallery_ids {
+    for id in ids_to_download {
         match hitomi_client.get_comic(id).await {
             Ok(comic) => {
                 if let Err(err) = download_manager

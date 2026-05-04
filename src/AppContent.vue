@@ -59,6 +59,7 @@ onMounted(async () => {
     config.uiLocale = locale.value
   }
   store.config = config
+  await autoCheckEhentaiFavorites()
   // check the logs directory size
   const result = await commands.getLogsDirSize()
   if (result.status === 'error') {
@@ -89,6 +90,52 @@ onMounted(async () => {
     })
   }
 })
+
+async function autoCheckEhentaiFavorites() {
+  if (
+    store.config === undefined ||
+    !store.config.ehentaiFavoritesAutoCheck ||
+    store.config.ehentaiCookie.trim() === '' ||
+    store.config.ehentaiFavoritesUrl.trim() === '' ||
+    store.config.ehentaiFavoritesDownloadDir === ''
+  ) {
+    return
+  }
+
+  const result = await commands.importEhentaiFavorites(
+    store.config.ehentaiCookie,
+    store.config.ehentaiFavoritesUrl.trim(),
+    store.config.ehentaiFavoritesDownloadDir,
+    store.config.ehentaiFavoritesLimit,
+    store.config.ehentaiFavoritesKnownIds,
+    false,
+  )
+  if (result.status === 'error') {
+    console.error(result.error)
+    notification.warning({
+      title: () => t('app_content.ehentai_auto_check_failed'),
+      description: () => result.error.err_message,
+    })
+    return
+  }
+
+  store.config.ehentaiFavoritesKnownIds = Array.from(
+    new Set([...store.config.ehentaiFavoritesKnownIds, ...result.data.foundIds]),
+  )
+
+  if (result.data.queuedCount > 0 || result.data.failedCount > 0) {
+    notification.success({
+      title: () => t('app_content.ehentai_auto_check_done'),
+      description: () =>
+        t('search_pane.ehentai_import_summary', {
+          found: result.data.foundCount,
+          queued: result.data.queuedCount,
+          skipped: result.data.skippedKnownCount,
+          failed: result.data.failedCount,
+        }),
+    })
+  }
+}
 
 watch(
   locale,

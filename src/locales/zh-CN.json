@@ -25,7 +25,9 @@
     "click_top_center": "点击顶部中间的",
     "there_is": "里面有",
     "you_can_also_uncheck": "你也可以取消勾选",
-    "this_will_disable_file_logging": "这样将不再输出日志到文件"
+    "this_will_disable_file_logging": "这样将不再输出日志到文件",
+    "ehentai_auto_check_done": "E-Hentai 收藏检查完成",
+    "ehentai_auto_check_failed": "E-Hentai 收藏检查失败"
   },
   "log_viewer": {
     "name": "日志",
@@ -78,11 +80,12 @@
     "ehentai_favorites": "E-Hentai 收藏",
     "ehentai_cookie": "Cookie",
     "ehentai_favorites_url": "收藏页 URL",
+    "ehentai_auto_check": "软件启动时检查新收藏",
     "ehentai_limit": "数量",
     "ehentai_import": "搜索并下载",
     "ehentai_import_invalid": "Cookie、URL 和文件夹不能为空",
     "ehentai_import_done": "收藏已加入下载",
-    "ehentai_import_summary": "找到 {found}，加入 {queued}，失败 {failed}"
+    "ehentai_import_summary": "找到 {found}，加入 {queued}，跳过 {skipped}，失败 {failed}"
   },
   "downloaded_pane": {
     "name": "本地库存",

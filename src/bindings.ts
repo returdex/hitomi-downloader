@@ -51,9 +51,9 @@ async createDownloadTask(comic: Comic) : Promise<Result<null, CommandError>> {
     else return { status: "error", error: e  as any };
 }
 },
-async importEhentaiFavorites(cookie: string, favoritesUrl: string, downloadDir: string, limit?: number | null) : Promise<Result<EhentaiFavoritesImportResult, CommandError>> {
+async importEhentaiFavorites(cookie: string, favoritesUrl: string, downloadDir: string, limit?: number | null, knownIds: number[] = [], downloadKnown: boolean = false) : Promise<Result<EhentaiFavoritesImportResult, CommandError>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("import_ehentai_favorites", { cookie, favoritesUrl, downloadDir, limit }) };
+    return { status: "ok", data: await TAURI_INVOKE("import_ehentai_favorites", { cookie, favoritesUrl, downloadDir, limit, knownIds, downloadKnown }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
@@ -169,12 +169,12 @@ logEvent: "log-event"
 
 export type Comic = { id: number; title: string; japaneseTitle: string; language: string; languageLocalname: string; type: string; date: string; artists: string[]; groups: string[]; parodys: string[]; tags: Tag[]; related: number[]; languages: Language[]; characters: string[]; sceneIndexes: number[]; files: GalleryFiles[]; coverUrl: string; isDownloaded?: boolean | null; comicDownloadDir?: string | null }
 export type CommandError = { err_title: string; err_message: string }
-export type Config = { downloadDir: string; exportDir: string; uiLocale: string; enableFileLogger: boolean; downloadFormat: DownloadFormat; dirFmt: string; proxyHost: string; proxyMode: ProxyMode; proxyPort: number }
+export type Config = { downloadDir: string; exportDir: string; uiLocale: string; enableFileLogger: boolean; downloadFormat: DownloadFormat; dirFmt: string; proxyHost: string; proxyMode: ProxyMode; proxyPort: number; ehentaiCookie: string; ehentaiFavoritesUrl: string; ehentaiFavoritesDownloadDir: string; ehentaiFavoritesLimit?: number | null; ehentaiFavoritesAutoCheck: boolean; ehentaiFavoritesKnownIds: number[] }
 export type DownloadFormat = "Webp" | "Avif"
 export type DownloadSpeedEvent = { speed: string }
 export type DownloadTaskEvent = { event: "Create"; data: { state: DownloadTaskState; comic: Comic; downloadedImgCount: number; totalImgCount: number } } | { event: "Update"; data: { comicId: number; state: DownloadTaskState; downloadedImgCount: number; totalImgCount: number } }
 export type DownloadTaskState = "Pending" | "Downloading" | "Paused" | "Cancelled" | "Completed" | "Failed"
-export type EhentaiFavoritesImportResult = { foundCount: number; queuedCount: number; failedCount: number; failedIds: number[] }
+export type EhentaiFavoritesImportResult = { foundCount: number; skippedKnownCount: number; queuedCount: number; failedCount: number; failedIds: number[]; foundIds: number[] }
 export type ExportCbzEvent = { event: "Start"; data: { uuid: string; title: string } } | { event: "Error"; data: { uuid: string } } | { event: "End"; data: { uuid: string } }
 export type ExportPdfEvent = { event: "Start"; data: { uuid: string; title: string } } | { event: "Error"; data: { uuid: string } } | { event: "End"; data: { uuid: string } }
 export type GalleryFiles = { width: number; hash: string; haswebp?: number; hasavif?: number; hasjxl?: number; name: string; height: number }

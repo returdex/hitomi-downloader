@@ -25,7 +25,9 @@
     "click_top_center": "Click the top-center",
     "there_is": "There is",
     "you_can_also_uncheck": "You can uncheck",
-    "this_will_disable_file_logging": "This will stop file logging"
+    "this_will_disable_file_logging": "This will stop file logging",
+    "ehentai_auto_check_done": "E-Hentai favorites checked",
+    "ehentai_auto_check_failed": "E-Hentai favorites check failed"
   },
   "log_viewer": {
     "name": "Log",
@@ -78,11 +80,12 @@
     "ehentai_favorites": "E-Hentai Favorites",
     "ehentai_cookie": "Cookie",
     "ehentai_favorites_url": "Favorites URL",
+    "ehentai_auto_check": "Check for new favorites when the app starts",
     "ehentai_limit": "Limit",
     "ehentai_import": "Search & Download",
     "ehentai_import_invalid": "Cookie, URL, and folder are required",
     "ehentai_import_done": "Favorites queued",
-    "ehentai_import_summary": "Found {found}, queued {queued}, failed {failed}"
+    "ehentai_import_summary": "Found {found}, queued {queued}, skipped {skipped}, failed {failed}"
   },
   "downloaded_pane": {
     "name": "Local",

@@ -19,10 +19,6 @@ const notification = useNotification()
 const searchInput = ref<string>('')
 const searchInputRef = ref<InstanceType<typeof FloatLabelInput>>()
 const comicIdInput = ref<string>('')
-const ehentaiCookie = ref<string>('')
-const ehentaiFavoritesUrl = ref<string>('https://e-hentai.org/favorites.php')
-const ehentaiDownloadDir = ref<string>(store.config?.downloadDir ?? '')
-const ehentaiImportLimit = ref<number | null>(25)
 const currentPage = ref<number>(1)
 const comicCardContainerRef = ref<HTMLElement>()
 const {
@@ -128,14 +124,21 @@ async function selectEhentaiDownloadDir() {
   if (selectedDirPath === null) {
     return
   }
-  ehentaiDownloadDir.value = selectedDirPath
+  if (store.config !== undefined) {
+    store.config.ehentaiFavoritesDownloadDir = selectedDirPath
+  }
 }
 
 async function importEhentaiFavorites() {
   if (importingEhentaiFavorites.value) {
     return
   }
-  if (ehentaiCookie.value.trim() === '' || ehentaiFavoritesUrl.value.trim() === '' || ehentaiDownloadDir.value === '') {
+  if (
+    store.config === undefined ||
+    store.config.ehentaiCookie.trim() === '' ||
+    store.config.ehentaiFavoritesUrl.trim() === '' ||
+    store.config.ehentaiFavoritesDownloadDir === ''
+  ) {
     notification.error({
       title: () => t('search_pane.ehentai_import_invalid'),
     })
@@ -144,10 +147,12 @@ async function importEhentaiFavorites() {
 
   importingEhentaiFavorites.value = true
   const result = await commands.importEhentaiFavorites(
-    ehentaiCookie.value,
-    ehentaiFavoritesUrl.value.trim(),
-    ehentaiDownloadDir.value,
-    ehentaiImportLimit.value === null ? undefined : ehentaiImportLimit.value,
+    store.config.ehentaiCookie,
+    store.config.ehentaiFavoritesUrl.trim(),
+    store.config.ehentaiFavoritesDownloadDir,
+    store.config.ehentaiFavoritesLimit,
+    store.config.ehentaiFavoritesKnownIds,
+    false,
   )
   importingEhentaiFavorites.value = false
 
@@ -160,10 +165,20 @@ async function importEhentaiFavorites() {
     return
   }
 
-  const { foundCount, queuedCount, failedCount } = result.data
+  store.config.ehentaiFavoritesKnownIds = Array.from(
+    new Set([...store.config.ehentaiFavoritesKnownIds, ...result.data.foundIds]),
+  )
+
+  const { foundCount, queuedCount, failedCount, skippedKnownCount } = result.data
   notification.success({
     title: () => t('search_pane.ehentai_import_done'),
-    description: () => t('search_pane.ehentai_import_summary', { found: foundCount, queued: queuedCount, failed: failedCount }),
+    description: () =>
+      t('search_pane.ehentai_import_summary', {
+        found: foundCount,
+        queued: queuedCount,
+        skipped: skippedKnownCount,
+        failed: failedCount,
+      }),
   })
 }
 
@@ -326,21 +341,28 @@ defineExpose({ search })
 
     <n-collapse class="box-border px-2">
       <n-collapse-item :title="t('search_pane.ehentai_favorites')" name="ehentai-favorites">
-        <div class="flex flex-col gap-2">
+        <div v-if="store.config !== undefined" class="flex flex-col gap-2">
+          <n-checkbox v-model:checked="store.config.ehentaiFavoritesAutoCheck">
+            {{ t('search_pane.ehentai_auto_check') }}
+          </n-checkbox>
           <FloatLabelInput
             :label="t('search_pane.ehentai_cookie')"
             type="password"
             size="small"
-            v-model:value="ehentaiCookie"
+            v-model:value="store.config.ehentaiCookie"
             clearable />
           <FloatLabelInput
             :label="t('search_pane.ehentai_favorites_url')"
             size="small"
-            v-model:value="ehentaiFavoritesUrl"
+            v-model:value="store.config.ehentaiFavoritesUrl"
             clearable />
           <n-input-group>
             <n-input-group-label size="small">{{ t('common.download_directory') }}</n-input-group-label>
-            <n-input v-model:value="ehentaiDownloadDir" size="small" readonly @click="selectEhentaiDownloadDir" />
+            <n-input
+              v-model:value="store.config.ehentaiFavoritesDownloadDir"
+              size="small"
+              readonly
+              @click="selectEhentaiDownloadDir" />
             <n-button class="w-9" size="small" @click="selectEhentaiDownloadDir">
               <template #icon>
                 <n-icon size="20">
@@ -352,7 +374,7 @@ defineExpose({ search })
           <div class="flex gap-2">
             <n-input-number
               class="w-32"
-              v-model:value="ehentaiImportLimit"
+              v-model:value="store.config.ehentaiFavoritesLimit"
               size="small"
               :min="1"
               :placeholder="t('search_pane.ehentai_limit')" />
