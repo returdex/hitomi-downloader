@@ -44,7 +44,19 @@ pub struct EhentaiFavoritesImportResult {
 #[derive(Debug, Clone, Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct EhentaiConnectivityResult {
+    pub checks: Vec<EhentaiConnectivityCheck>,
+    pub summary: String,
+}
+
+#[derive(Debug, Clone, Serialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct EhentaiConnectivityCheck {
+    pub label: String,
+    pub url: String,
+    pub status_code: u16,
+    pub status_text: String,
     pub found_count: usize,
+    pub body_hint: String,
 }
 
 #[tauri::command]
@@ -295,16 +307,38 @@ pub async fn test_ehentai_connectivity(
         ));
     }
 
-    let html = hitomi_client
-        .get_ehentai_favorites_html(&favorites_url, cookie)
-        .await
-        .map_err(|err| CommandError::from("Failed to connect to E-Hentai", err))?;
-    let gallery_ids = parse_ehentai_gallery_ids(&html, None)
-        .map_err(|err| CommandError::from("Failed to parse E-Hentai favorites", err))?;
+    let check_specs = [
+        ("Home without cookie", "https://e-hentai.org/", None),
+        ("Favorites without cookie", favorites_url.as_str(), None),
+        (
+            "Favorites with saved cookie",
+            favorites_url.as_str(),
+            Some(cookie),
+        ),
+    ];
+    let mut checks = Vec::new();
 
-    Ok(EhentaiConnectivityResult {
-        found_count: gallery_ids.len(),
-    })
+    for (label, url, cookie) in check_specs {
+        let page = hitomi_client
+            .fetch_ehentai_page(url, cookie)
+            .await
+            .map_err(|err| CommandError::from("Failed to connect to E-Hentai", err))?;
+        let found_count = parse_ehentai_gallery_ids(&page.body, None)
+            .map_err(|err| CommandError::from("Failed to parse E-Hentai favorites", err))?
+            .len();
+        checks.push(EhentaiConnectivityCheck {
+            label: label.to_string(),
+            url: url.to_string(),
+            status_code: page.status_code,
+            status_text: page.status_text,
+            found_count,
+            body_hint: html_hint(&page.body),
+        });
+    }
+
+    let summary = summarize_ehentai_connectivity(&checks);
+
+    Ok(EhentaiConnectivityResult { checks, summary })
 }
 
 fn parse_ehentai_gallery_ids(html: &str, limit: Option<usize>) -> anyhow::Result<Vec<i32>> {
@@ -330,6 +364,47 @@ fn parse_ehentai_gallery_ids(html: &str, limit: Option<usize>) -> anyhow::Result
     }
 
     Ok(ids)
+}
+
+fn html_hint(html: &str) -> String {
+    html.split_whitespace()
+        .collect::<Vec<&str>>()
+        .join(" ")
+        .chars()
+        .take(220)
+        .collect()
+}
+
+fn summarize_ehentai_connectivity(checks: &[EhentaiConnectivityCheck]) -> String {
+    let all_451 = checks.iter().all(|check| check.status_code == 451);
+    if all_451 {
+        return "All E-Hentai checks returned 451. The request path used by the app is still being classified as legally unavailable.".to_string();
+    }
+
+    let home_ok = checks
+        .iter()
+        .find(|check| check.label == "Home without cookie")
+        .is_some_and(|check| check.status_code == 200);
+    let favorites_with_cookie = checks
+        .iter()
+        .find(|check| check.label == "Favorites with saved cookie");
+
+    if home_ok
+        && favorites_with_cookie
+            .is_some_and(|check| check.status_code == 200 && check.found_count > 0)
+    {
+        return "Connection and cookie look valid. Favorites page is reachable and gallery links were parsed.".to_string();
+    }
+
+    if home_ok && favorites_with_cookie.is_some_and(|check| check.status_code == 451) {
+        return "E-Hentai home is reachable, but the favorites page with the saved cookie returns 451. This points to the account/session/favorites route rather than general network reachability.".to_string();
+    }
+
+    if home_ok && favorites_with_cookie.is_some_and(|check| check.status_code == 200) {
+        return "E-Hentai is reachable with the saved cookie, but no favorite gallery links were parsed from this page.".to_string();
+    }
+
+    "Diagnostics completed. Compare the per-check status codes and response hints to identify whether the failure is network-wide, favorites-page-specific, or cookie-specific.".to_string()
 }
 
 #[allow(clippy::needless_pass_by_value)]

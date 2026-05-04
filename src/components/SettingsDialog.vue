@@ -7,12 +7,11 @@ import { appDataDir } from '@tauri-apps/api/path'
 import { commands } from '../bindings.ts'
 import FloatLabelInput from './FloatLabelInput.vue'
 import { buildEhentaiCookie, hasEhentaiCookie } from '../utils.ts'
-import { useMessage, useNotification } from 'naive-ui'
+import { useNotification } from 'naive-ui'
 
 const { t } = useI18n()
 
 const store = useStore()
-const message = useMessage()
 const notification = useNotification()
 
 const showing = defineModel<boolean>('showing', { required: true })
@@ -58,7 +57,18 @@ async function testEhentaiConnectivity() {
     return
   }
 
-  message.success(() => t('settings_dialog.ehentai_cookie.test_success', { count: result.data.foundCount }))
+  const detail = result.data.checks
+    .map(
+      (check) =>
+        `${check.label}: ${check.statusCode} ${check.statusText}, ${t('settings_dialog.ehentai_cookie.test_found', { count: check.foundCount })}\n${check.bodyHint}`,
+    )
+    .join('\n\n')
+
+  notification.success({
+    title: () => t('settings_dialog.ehentai_cookie.test_success'),
+    description: () => `${result.data.summary}\n\n${detail}`,
+    duration: 12000,
+  })
 }
 </script>
 

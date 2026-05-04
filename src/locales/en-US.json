@@ -61,7 +61,8 @@
       "igneous": "igneous",
       "test": "Test Connection",
       "test_invalid": "Cookie fields and Favorites URL are required",
-      "test_success": "Connected. Found {count} favorites on this page"
+      "test_success": "E-Hentai diagnostics complete",
+      "test_found": "found {count} favorites"
     },
     "directory_format": {
       "name": "Folder Format",

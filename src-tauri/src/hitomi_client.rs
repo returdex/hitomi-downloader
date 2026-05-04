@@ -18,6 +18,13 @@ use crate::{
     utils::get_app_handle,
 };
 
+#[derive(Debug, Clone)]
+pub struct EhentaiPageFetchResult {
+    pub status_code: u16,
+    pub status_text: String,
+    pub body: String,
+}
+
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct LoginResp {
@@ -174,6 +181,51 @@ impl HitomiClient {
             .text()
             .await
             .context("Failed to read E-Hentai favorites page")
+    }
+
+    pub async fn fetch_ehentai_page(
+        &self,
+        url: &str,
+        cookie: Option<&str>,
+    ) -> anyhow::Result<EhentaiPageFetchResult> {
+        let mut request = self
+            .api_client
+            .read()
+            .get(url)
+            .header(
+                reqwest::header::USER_AGENT,
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 \
+                 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            )
+            .header(
+                reqwest::header::ACCEPT,
+                "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            )
+            .header(reqwest::header::ACCEPT_LANGUAGE, "en-US,en;q=0.9")
+            .header(reqwest::header::REFERER, "https://e-hentai.org/");
+
+        if let Some(cookie) = cookie.filter(|cookie| !cookie.trim().is_empty()) {
+            request = request.header(reqwest::header::COOKIE, cookie.trim());
+        }
+
+        let http_resp = request
+            .send()
+            .await
+            .context("Failed to request E-Hentai page")?;
+        let status = http_resp.status();
+        let body = http_resp
+            .text()
+            .await
+            .context("Failed to read E-Hentai page")?;
+
+        Ok(EhentaiPageFetchResult {
+            status_code: status.as_u16(),
+            status_text: status
+                .canonical_reason()
+                .unwrap_or("Unknown Status")
+                .to_string(),
+            body,
+        })
     }
 
     pub async fn get_cover_data(&self, cover_url: &str) -> anyhow::Result<Bytes> {
