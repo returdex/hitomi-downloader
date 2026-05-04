@@ -62,7 +62,7 @@
       "test": "Test Connection",
       "test_invalid": "Cookie fields and Favorites URL are required",
       "test_success": "E-Hentai diagnostics complete",
-      "test_found": "found {count} favorites"
+      "test_found": "found {count} gallery links"
     },
     "directory_format": {
       "name": "Folder Format",

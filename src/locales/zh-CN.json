@@ -62,7 +62,7 @@
       "test": "测试连接",
       "test_invalid": "Cookie 字段和收藏页 URL 不能为空",
       "test_success": "E-Hentai 诊断完成",
-      "test_found": "找到 {count} 个收藏"
+      "test_found": "找到 {count} 个图库链接"
     },
     "directory_format": {
       "name": "文件夹格式",

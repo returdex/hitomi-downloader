@@ -378,7 +378,7 @@ fn html_hint(html: &str) -> String {
 fn summarize_ehentai_connectivity(checks: &[EhentaiConnectivityCheck]) -> String {
     let all_451 = checks.iter().all(|check| check.status_code == 451);
     if all_451 {
-        return "All E-Hentai checks returned 451. The request path used by the app is still being classified as legally unavailable.".to_string();
+        return "All E-Hentai checks returned 451, but E-Hentai may still provide usable HTML in the response body. Check the parsed gallery-link counts below.".to_string();
     }
 
     let home_ok = checks
@@ -394,6 +394,11 @@ fn summarize_ehentai_connectivity(checks: &[EhentaiConnectivityCheck]) -> String
             .is_some_and(|check| check.status_code == 200 && check.found_count > 0)
     {
         return "Connection and cookie look valid. Favorites page is reachable and gallery links were parsed.".to_string();
+    }
+
+    if favorites_with_cookie.is_some_and(|check| check.status_code == 451 && check.found_count > 0)
+    {
+        return "The favorites request returned 451, but the response body contains parsable gallery links. The app will treat this as usable content.".to_string();
     }
 
     if home_ok && favorites_with_cookie.is_some_and(|check| check.status_code == 451) {

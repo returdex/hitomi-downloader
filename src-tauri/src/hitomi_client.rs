@@ -173,14 +173,15 @@ impl HitomiClient {
             .context("Failed to request E-Hentai favorites page")?;
 
         let status = http_resp.status();
-        if !status.is_success() {
+        let body = http_resp
+            .text()
+            .await
+            .context("Failed to read E-Hentai favorites page")?;
+        if !status.is_success() && status.as_u16() != 451 {
             return Err(anyhow!("Unexpected E-Hentai response status: {status}"));
         }
 
-        http_resp
-            .text()
-            .await
-            .context("Failed to read E-Hentai favorites page")
+        Ok(body)
     }
 
     pub async fn fetch_ehentai_page(
