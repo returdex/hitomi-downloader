@@ -1,4 +1,4 @@
-use std::{path::PathBuf, time::Duration};
+use std::path::PathBuf;
 
 use anyhow::{anyhow, Context};
 use indexmap::IndexMap;
@@ -199,28 +199,10 @@ pub async fn import_ehentai_favorites(
         ));
     }
 
-    let html = reqwest::ClientBuilder::new()
-        .timeout(Duration::from_secs(10))
-        .build()
-        .map_err(|err| CommandError::from("Failed to create E-Hentai client", err))?
-        .get(&favorites_url)
-        .header(reqwest::header::COOKIE, cookie)
-        .header(reqwest::header::USER_AGENT, "hitomi-downloader")
-        .send()
+    let html = hitomi_client
+        .get_ehentai_favorites_html(&favorites_url, cookie)
         .await
-        .context("Failed to request E-Hentai favorites page")
-        .and_then(|resp| {
-            let status = resp.status();
-            if status.is_success() {
-                Ok(resp)
-            } else {
-                Err(anyhow!("Unexpected E-Hentai response status: {status}"))
-            }
-        })
-        .map_err(|err| CommandError::from("Failed to load E-Hentai favorites", err))?
-        .text()
-        .await
-        .map_err(|err| CommandError::from("Failed to read E-Hentai favorites", err))?;
+        .map_err(|err| CommandError::from("Failed to load E-Hentai favorites", err))?;
 
     let gallery_ids = parse_ehentai_gallery_ids(&html, limit)
         .map_err(|err| CommandError::from("Failed to parse E-Hentai favorites", err))?;

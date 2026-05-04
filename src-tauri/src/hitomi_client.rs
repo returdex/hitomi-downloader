@@ -140,6 +140,32 @@ impl HitomiClient {
         Ok(suggestion)
     }
 
+    pub async fn get_ehentai_favorites_html(
+        &self,
+        favorites_url: &str,
+        cookie: &str,
+    ) -> anyhow::Result<String> {
+        let http_resp = self
+            .api_client
+            .read()
+            .get(favorites_url)
+            .header(reqwest::header::COOKIE, cookie)
+            .header(reqwest::header::USER_AGENT, "hitomi-downloader")
+            .send()
+            .await
+            .context("Failed to request E-Hentai favorites page")?;
+
+        let status = http_resp.status();
+        if !status.is_success() {
+            return Err(anyhow!("Unexpected E-Hentai response status: {status}"));
+        }
+
+        http_resp
+            .text()
+            .await
+            .context("Failed to read E-Hentai favorites page")
+    }
+
     pub async fn get_cover_data(&self, cover_url: &str) -> anyhow::Result<Bytes> {
         let request = self
             .cover_client
