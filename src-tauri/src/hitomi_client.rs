@@ -150,7 +150,17 @@ impl HitomiClient {
             .read()
             .get(favorites_url)
             .header(reqwest::header::COOKIE, cookie)
-            .header(reqwest::header::USER_AGENT, "hitomi-downloader")
+            .header(
+                reqwest::header::USER_AGENT,
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 \
+                 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            )
+            .header(
+                reqwest::header::ACCEPT,
+                "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            )
+            .header(reqwest::header::ACCEPT_LANGUAGE, "en-US,en;q=0.9")
+            .header(reqwest::header::REFERER, "https://e-hentai.org/")
             .send()
             .await
             .context("Failed to request E-Hentai favorites page")?;
