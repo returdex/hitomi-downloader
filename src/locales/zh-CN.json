@@ -58,7 +58,10 @@
       "name": "E-Hentai Cookie",
       "ipb_member_id": "ipb_member_id",
       "ipb_pass_hash": "ipb_pass_hash",
-      "igneous": "igneous"
+      "igneous": "igneous",
+      "test": "测试连接",
+      "test_invalid": "Cookie 字段和收藏页 URL 不能为空",
+      "test_success": "连接成功，本页找到 {count} 个收藏"
     },
     "directory_format": {
       "name": "文件夹格式",

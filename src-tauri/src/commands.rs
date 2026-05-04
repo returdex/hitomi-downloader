@@ -41,6 +41,12 @@ pub struct EhentaiFavoritesImportResult {
     pub found_ids: Vec<i32>,
 }
 
+#[derive(Debug, Clone, Serialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct EhentaiConnectivityResult {
+    pub found_count: usize,
+}
+
 #[tauri::command]
 #[specta::specta]
 pub fn greet(name: &str) -> String {
@@ -264,6 +270,41 @@ pub async fn import_ehentai_favorites(
         "import E-Hentai favorites success"
     );
     Ok(result)
+}
+
+#[tauri::command(async)]
+#[specta::specta]
+pub async fn test_ehentai_connectivity(
+    hitomi_client: State<'_, HitomiClient>,
+    cookie: String,
+    favorites_url: String,
+) -> CommandResult<EhentaiConnectivityResult> {
+    let cookie = cookie.trim();
+    if cookie.is_empty() {
+        return Err(CommandError::from(
+            "E-Hentai cookie is empty",
+            anyhow!("Cookie is required"),
+        ));
+    }
+    if !favorites_url.starts_with("https://e-hentai.org/")
+        && !favorites_url.starts_with("https://exhentai.org/")
+    {
+        return Err(CommandError::from(
+            "Invalid E-Hentai favorites URL",
+            anyhow!("URL must start with https://e-hentai.org/ or https://exhentai.org/"),
+        ));
+    }
+
+    let html = hitomi_client
+        .get_ehentai_favorites_html(&favorites_url, cookie)
+        .await
+        .map_err(|err| CommandError::from("Failed to connect to E-Hentai", err))?;
+    let gallery_ids = parse_ehentai_gallery_ids(&html, None)
+        .map_err(|err| CommandError::from("Failed to parse E-Hentai favorites", err))?;
+
+    Ok(EhentaiConnectivityResult {
+        found_count: gallery_ids.len(),
+    })
 }
 
 fn parse_ehentai_gallery_ids(html: &str, limit: Option<usize>) -> anyhow::Result<Vec<i32>> {

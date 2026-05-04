@@ -6,15 +6,20 @@ import { path } from '@tauri-apps/api'
 import { appDataDir } from '@tauri-apps/api/path'
 import { commands } from '../bindings.ts'
 import FloatLabelInput from './FloatLabelInput.vue'
+import { buildEhentaiCookie, hasEhentaiCookie } from '../utils.ts'
+import { useMessage, useNotification } from 'naive-ui'
 
 const { t } = useI18n()
 
 const store = useStore()
+const message = useMessage()
+const notification = useNotification()
 
 const showing = defineModel<boolean>('showing', { required: true })
 
 const proxyHost = ref<string>(store.config?.proxyHost ?? '')
 const dirFmt = ref<string>(store.config?.dirFmt ?? '')
+const testingEhentaiConnectivity = ref<boolean>(false)
 
 const disableProxyHostAndPort = computed(() => store.config?.proxyMode !== 'Custom')
 
@@ -25,6 +30,35 @@ async function showConfigInFileManager() {
   if (result.status === 'error') {
     console.error(result.error)
   }
+}
+
+async function testEhentaiConnectivity() {
+  if (store.config === undefined || testingEhentaiConnectivity.value) {
+    return
+  }
+  if (!hasEhentaiCookie(store.config) || store.config.ehentaiFavoritesUrl.trim() === '') {
+    notification.error({
+      title: () => t('settings_dialog.ehentai_cookie.test_invalid'),
+    })
+    return
+  }
+
+  testingEhentaiConnectivity.value = true
+  const result = await commands.testEhentaiConnectivity(
+    buildEhentaiCookie(store.config),
+    store.config.ehentaiFavoritesUrl.trim(),
+  )
+  testingEhentaiConnectivity.value = false
+
+  if (result.status === 'error') {
+    notification.error({
+      title: () => result.error.err_title,
+      description: () => result.error.err_message,
+    })
+    return
+  }
+
+  message.success(() => t('settings_dialog.ehentai_cookie.test_success', { count: result.data.foundCount }))
 }
 </script>
 
@@ -85,6 +119,15 @@ async function showConfigInFileManager() {
                 size="small"
                 v-model:value="store.config.ehentaiIgneous"
                 clearable />
+              <n-button
+                class="ml-auto"
+                size="small"
+                type="primary"
+                secondary
+                :loading="testingEhentaiConnectivity"
+                @click="testEhentaiConnectivity">
+                {{ t('settings_dialog.ehentai_cookie.test') }}
+              </n-button>
             </div>
           </n-collapse-item>
         </n-collapse>

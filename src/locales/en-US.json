@@ -58,7 +58,10 @@
       "name": "E-Hentai Cookie",
       "ipb_member_id": "ipb_member_id",
       "ipb_pass_hash": "ipb_pass_hash",
-      "igneous": "igneous"
+      "igneous": "igneous",
+      "test": "Test Connection",
+      "test_invalid": "Cookie fields and Favorites URL are required",
+      "test_success": "Connected. Found {count} favorites on this page"
     },
     "directory_format": {
       "name": "Folder Format",

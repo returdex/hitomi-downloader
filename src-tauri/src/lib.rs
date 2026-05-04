@@ -38,6 +38,7 @@ pub fn run() {
             get_comic,
             create_download_task,
             import_ehentai_favorites,
+            test_ehentai_connectivity,
             pause_download_task,
             resume_download_task,
             cancel_download_task,
