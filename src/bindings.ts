@@ -169,7 +169,7 @@ logEvent: "log-event"
 
 export type Comic = { id: number; title: string; japaneseTitle: string; language: string; languageLocalname: string; type: string; date: string; artists: string[]; groups: string[]; parodys: string[]; tags: Tag[]; related: number[]; languages: Language[]; characters: string[]; sceneIndexes: number[]; files: GalleryFiles[]; coverUrl: string; isDownloaded?: boolean | null; comicDownloadDir?: string | null }
 export type CommandError = { err_title: string; err_message: string }
-export type Config = { downloadDir: string; exportDir: string; uiLocale: string; enableFileLogger: boolean; downloadFormat: DownloadFormat; dirFmt: string; proxyHost: string; proxyMode: ProxyMode; proxyPort: number; ehentaiCookie: string; ehentaiFavoritesUrl: string; ehentaiFavoritesDownloadDir: string; ehentaiFavoritesLimit?: number | null; ehentaiFavoritesAutoCheck: boolean; ehentaiFavoritesKnownIds: number[] }
+export type Config = { downloadDir: string; exportDir: string; uiLocale: string; enableFileLogger: boolean; downloadFormat: DownloadFormat; dirFmt: string; proxyHost: string; proxyMode: ProxyMode; proxyPort: number; ehentaiIpbMemberId: string; ehentaiIpbPassHash: string; ehentaiIgneous: string; ehentaiFavoritesUrl: string; ehentaiFavoritesDownloadDir: string; ehentaiFavoritesLimit?: number | null; ehentaiFavoritesAutoCheck: boolean; ehentaiFavoritesKnownIds: number[] }
 export type DownloadFormat = "Webp" | "Avif"
 export type DownloadSpeedEvent = { speed: string }
 export type DownloadTaskEvent = { event: "Create"; data: { state: DownloadTaskState; comic: Comic; downloadedImgCount: number; totalImgCount: number } } | { event: "Update"; data: { comicId: number; state: DownloadTaskState; downloadedImgCount: number; totalImgCount: number } }

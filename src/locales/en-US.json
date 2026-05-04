@@ -54,6 +54,12 @@
     "no_proxy": "No Proxy",
     "custom_proxy": "Custom",
     "open_config_directory": "Open Config Folder",
+    "ehentai_cookie": {
+      "name": "E-Hentai Cookie",
+      "ipb_member_id": "ipb_member_id",
+      "ipb_pass_hash": "ipb_pass_hash",
+      "igneous": "igneous"
+    },
     "directory_format": {
       "name": "Folder Format",
       "directory_level_tips": "Use the forward slash {slash} to separate directory levels",
@@ -78,12 +84,12 @@
     "comic_id_invalid": "Invalid Comic ID format",
     "enter_comic_id_or_url": "Please enter Comic ID or URL",
     "ehentai_favorites": "E-Hentai Favorites",
-    "ehentai_cookie": "Cookie",
+    "ehentai_cookie_settings_hint": "Set ipb_member_id, ipb_pass_hash, and igneous in Settings.",
     "ehentai_favorites_url": "Favorites URL",
     "ehentai_auto_check": "Check for new favorites when the app starts",
     "ehentai_limit": "Limit",
     "ehentai_import": "Search & Download",
-    "ehentai_import_invalid": "Cookie, URL, and folder are required",
+    "ehentai_import_invalid": "E-Hentai cookie fields, URL, and folder are required",
     "ehentai_import_done": "Favorites queued",
     "ehentai_import_summary": "Found {found}, queued {queued}, skipped {skipped}, failed {failed}"
   },

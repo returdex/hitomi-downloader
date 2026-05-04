@@ -4,7 +4,7 @@ import { useMessage, useNotification } from 'naive-ui'
 import { commands } from './bindings.ts'
 import { useStore } from './store.ts'
 import LogViewer from './components/LogViewer.vue'
-import { useI18n } from './utils.ts'
+import { buildEhentaiCookie, hasEhentaiCookie, useI18n } from './utils.ts'
 import AboutDialog from './components/AboutDialog.vue'
 import SearchPane from './panes/SearchPane.vue'
 import DownloadedPane from './panes/DownloadedPane.vue'
@@ -95,7 +95,7 @@ async function autoCheckEhentaiFavorites() {
   if (
     store.config === undefined ||
     !store.config.ehentaiFavoritesAutoCheck ||
-    store.config.ehentaiCookie.trim() === '' ||
+    !hasEhentaiCookie(store.config) ||
     store.config.ehentaiFavoritesUrl.trim() === '' ||
     store.config.ehentaiFavoritesDownloadDir === ''
   ) {
@@ -103,7 +103,7 @@ async function autoCheckEhentaiFavorites() {
   }
 
   const result = await commands.importEhentaiFavorites(
-    store.config.ehentaiCookie,
+    buildEhentaiCookie(store.config),
     store.config.ehentaiFavoritesUrl.trim(),
     store.config.ehentaiFavoritesDownloadDir,
     store.config.ehentaiFavoritesLimit,

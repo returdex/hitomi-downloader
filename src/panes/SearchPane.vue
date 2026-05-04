@@ -5,7 +5,7 @@ import { SelectOption, useMessage, useNotification } from 'naive-ui'
 import { open } from '@tauri-apps/plugin-dialog'
 import ComicCard from '../components/ComicCard.vue'
 import { useStore } from '../store.ts'
-import { useI18n } from '../utils.ts'
+import { buildEhentaiCookie, hasEhentaiCookie, useI18n } from '../utils.ts'
 import { PhMagnifyingGlass, PhArrowRight, PhFolderOpen } from '@phosphor-icons/vue'
 import FloatLabelInput from '../components/FloatLabelInput.vue'
 
@@ -135,7 +135,7 @@ async function importEhentaiFavorites() {
   }
   if (
     store.config === undefined ||
-    store.config.ehentaiCookie.trim() === '' ||
+    !hasEhentaiCookie(store.config) ||
     store.config.ehentaiFavoritesUrl.trim() === '' ||
     store.config.ehentaiFavoritesDownloadDir === ''
   ) {
@@ -147,7 +147,7 @@ async function importEhentaiFavorites() {
 
   importingEhentaiFavorites.value = true
   const result = await commands.importEhentaiFavorites(
-    store.config.ehentaiCookie,
+    buildEhentaiCookie(store.config),
     store.config.ehentaiFavoritesUrl.trim(),
     store.config.ehentaiFavoritesDownloadDir,
     store.config.ehentaiFavoritesLimit,
@@ -345,12 +345,7 @@ defineExpose({ search })
           <n-checkbox v-model:checked="store.config.ehentaiFavoritesAutoCheck">
             {{ t('search_pane.ehentai_auto_check') }}
           </n-checkbox>
-          <FloatLabelInput
-            :label="t('search_pane.ehentai_cookie')"
-            type="password"
-            size="small"
-            v-model:value="store.config.ehentaiCookie"
-            clearable />
+          <span class="text-xs text-gray-500">{{ t('search_pane.ehentai_cookie_settings_hint') }}</span>
           <FloatLabelInput
             :label="t('search_pane.ehentai_favorites_url')"
             size="small"

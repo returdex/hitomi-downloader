@@ -18,7 +18,9 @@ pub struct Config {
     pub proxy_host: String,
     pub proxy_mode: ProxyMode,
     pub proxy_port: u16,
-    pub ehentai_cookie: String,
+    pub ehentai_ipb_member_id: String,
+    pub ehentai_ipb_pass_hash: String,
+    pub ehentai_igneous: String,
     pub ehentai_favorites_url: String,
     pub ehentai_favorites_download_dir: PathBuf,
     pub ehentai_favorites_limit: Option<usize>,
@@ -72,10 +74,40 @@ impl Config {
         for (key, value) in default_map {
             map.entry(key).or_insert(value);
         }
+        Config::migrate_ehentai_cookie_fields(map);
         let Ok(config) = serde_json::from_value(json_value) else {
             return Config::default(app_data_dir);
         };
         config
+    }
+
+    fn migrate_ehentai_cookie_fields(map: &mut serde_json::Map<String, serde_json::Value>) {
+        let Some(serde_json::Value::String(cookie)) = map.get("ehentaiCookie") else {
+            return;
+        };
+        let cookie = cookie.clone();
+        for part in cookie.split(';') {
+            let Some((key, value)) = part.trim().split_once('=') else {
+                continue;
+            };
+            let config_key = match key.trim() {
+                "ipb_member_id" => "ehentaiIpbMemberId",
+                "ipb_pass_hash" => "ehentaiIpbPassHash",
+                "igneous" => "ehentaiIgneous",
+                _ => continue,
+            };
+            if map
+                .get(config_key)
+                .and_then(serde_json::Value::as_str)
+                .is_some_and(|existing| !existing.is_empty())
+            {
+                continue;
+            }
+            map.insert(
+                config_key.to_string(),
+                serde_json::Value::String(value.trim().to_string()),
+            );
+        }
     }
 
     fn default(app_data_dir: &Path) -> Config {
@@ -89,7 +121,9 @@ impl Config {
             proxy_mode: ProxyMode::System,
             proxy_host: "127.0.0.1".to_string(),
             proxy_port: 7890,
-            ehentai_cookie: String::new(),
+            ehentai_ipb_member_id: String::new(),
+            ehentai_ipb_pass_hash: String::new(),
+            ehentai_igneous: String::new(),
             ehentai_favorites_url: "https://e-hentai.org/favorites.php".to_string(),
             ehentai_favorites_download_dir: app_data_dir.join("download"),
             ehentai_favorites_limit: Some(25),

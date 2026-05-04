@@ -54,6 +54,12 @@
     "no_proxy": "直连",
     "custom_proxy": "自定义",
     "open_config_directory": "打开配置目录",
+    "ehentai_cookie": {
+      "name": "E-Hentai Cookie",
+      "ipb_member_id": "ipb_member_id",
+      "ipb_pass_hash": "ipb_pass_hash",
+      "igneous": "igneous"
+    },
     "directory_format": {
       "name": "文件夹格式",
       "directory_level_tips": "可以使用斜杠 {slash} 来划分目录层级",
@@ -78,12 +84,12 @@
     "comic_id_invalid": "漫画 ID 格式错误",
     "enter_comic_id_or_url": "请输入漫画 ID 或链接",
     "ehentai_favorites": "E-Hentai 收藏",
-    "ehentai_cookie": "Cookie",
+    "ehentai_cookie_settings_hint": "请在设置中填写 ipb_member_id、ipb_pass_hash 和 igneous。",
     "ehentai_favorites_url": "收藏页 URL",
     "ehentai_auto_check": "软件启动时检查新收藏",
     "ehentai_limit": "数量",
     "ehentai_import": "搜索并下载",
-    "ehentai_import_invalid": "Cookie、URL 和文件夹不能为空",
+    "ehentai_import_invalid": "E-Hentai Cookie 字段、URL 和文件夹不能为空",
     "ehentai_import_done": "收藏已加入下载",
     "ehentai_import_summary": "找到 {found}，加入 {queued}，跳过 {skipped}，失败 {failed}"
   },

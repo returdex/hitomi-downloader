@@ -5,6 +5,7 @@ import { computed, ref } from 'vue'
 import { path } from '@tauri-apps/api'
 import { appDataDir } from '@tauri-apps/api/path'
 import { commands } from '../bindings.ts'
+import FloatLabelInput from './FloatLabelInput.vue'
 
 const { t } = useI18n()
 
@@ -64,6 +65,29 @@ async function showConfigInFileManager() {
             placeholder=""
             :parse="(x: string) => parseInt(x)" />
         </n-input-group>
+        <n-collapse>
+          <n-collapse-item :title="t('settings_dialog.ehentai_cookie.name')" name="ehentai-cookie">
+            <div class="flex flex-col gap-2">
+              <FloatLabelInput
+                :label="t('settings_dialog.ehentai_cookie.ipb_member_id')"
+                size="small"
+                v-model:value="store.config.ehentaiIpbMemberId"
+                clearable />
+              <FloatLabelInput
+                :label="t('settings_dialog.ehentai_cookie.ipb_pass_hash')"
+                type="password"
+                size="small"
+                v-model:value="store.config.ehentaiIpbPassHash"
+                clearable />
+              <FloatLabelInput
+                :label="t('settings_dialog.ehentai_cookie.igneous')"
+                type="password"
+                size="small"
+                v-model:value="store.config.ehentaiIgneous"
+                clearable />
+            </div>
+          </n-collapse-item>
+        </n-collapse>
         <n-tooltip placement="top" trigger="hover" width="580">
           <i18n-t keypath="settings_dialog.directory_format.directory_level_tips" tag="div" scope="global">
             <template v-slot:slash>
