@@ -2,11 +2,11 @@
 import { computed, onMounted } from 'vue'
 import { Comic, commands } from '../bindings.ts'
 import { useStore } from '../store.ts'
-import { useI18n } from '../utils.ts'
+import { formatComicDate, useI18n } from '../utils.ts'
 import DownloadButton from './DownloadButton.vue'
 import { PhArrowClockwise } from '@phosphor-icons/vue'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const props = defineProps<{
   comic: Comic
@@ -114,8 +114,7 @@ async function showComicDownloadDirInFileManager() {
           </n-button>
         </div>
         <div class="flex items-center gap-col-1">
-          <!-- TODO: format the date with i18n -->
-          <div>{{ comic.date }}</div>
+          <div>{{ formatComicDate(comic.date, locale) }}</div>
           <div class="ml-auto">{{ comic.files.length }}P</div>
         </div>
         <div class="flex mt-auto">

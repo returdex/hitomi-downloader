@@ -2,12 +2,12 @@
 import { useStore } from '../store.ts'
 import { Comic, commands } from '../bindings.ts'
 import { computed, watch, ref, nextTick } from 'vue'
-import { useI18n } from '../utils.ts'
+import { formatComicDate, useI18n } from '../utils.ts'
 import DownloadButton from '../components/DownloadButton.vue'
 import { PhArrowClockwise } from '@phosphor-icons/vue'
 import ComicCard from '../components/ComicCard.vue'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 defineProps<{
   search: (query: string, pageNum: number) => Promise<void>
@@ -102,8 +102,7 @@ async function showComicDownloadDirInFileManager() {
       </n-icon>
       <div class="flex flex-col w-full gap-1">
         <div>
-          <!-- TODO: format the date with i18n -->
-          {{ store.pickedComic.date }}
+          {{ formatComicDate(store.pickedComic.date, locale) }}
         </div>
         <div class="flex">
           <div>ID: {{ store.pickedComic.id }}</div>

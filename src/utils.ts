@@ -20,3 +20,17 @@ export function buildEhentaiCookie(config: Config): string {
 export function hasEhentaiCookie(config: Config): boolean {
   return config.ehentaiIpbMemberId.trim() !== '' && config.ehentaiIpbPassHash.trim() !== ''
 }
+
+export function formatComicDate(value: string, locale: string): string {
+  const trimmed = value.trim()
+  if (trimmed === '') {
+    return value
+  }
+
+  const date = new Date(trimmed)
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
+
+  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(date)
+}
