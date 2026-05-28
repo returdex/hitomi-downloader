@@ -59,6 +59,10 @@ async function search(query: string, pageNum: number) {
   const result = await commands.search(query, pageNum, false)
   if (result.status === 'error') {
     console.error(result.error)
+    notification.error({
+      title: () => t('search_pane.search_failed'),
+      description: () => result.error.err_message,
+    })
     searching.value = false
     return
   }
@@ -77,6 +81,10 @@ async function handlePageChange(pageNum: number) {
   const result = await commands.getPage(store.searchResult.ids, pageNum)
   if (result.status === 'error') {
     console.error(result.error)
+    notification.error({
+      title: () => t('search_pane.search_failed'),
+      description: () => result.error.err_message,
+    })
     return
   }
 
@@ -112,6 +120,10 @@ async function pickComic() {
   const result = await commands.getComic(comicId)
   if (result.status === 'error') {
     console.error(result.error)
+    notification.error({
+      title: () => t('search_pane.comic_load_failed'),
+      description: () => result.error.err_message,
+    })
     return
   }
 

@@ -6,8 +6,11 @@ import { formatComicDate, useI18n } from '../utils.ts'
 import DownloadButton from '../components/DownloadButton.vue'
 import { PhArrowClockwise } from '@phosphor-icons/vue'
 import ComicCard from '../components/ComicCard.vue'
+import { useMessage, useNotification } from 'naive-ui'
 
 const { t, locale } = useI18n()
+const message = useMessage()
+const notification = useNotification()
 
 defineProps<{
   search: (query: string, pageNum: number) => Promise<void>
@@ -44,6 +47,10 @@ async function pickComic(id: number) {
   const result = await commands.getComic(id)
   if (result.status === 'error') {
     console.error(result.error)
+    notification.error({
+      title: () => t('search_pane.comic_load_failed'),
+      description: () => result.error.err_message,
+    })
     return
   }
   store.pickedComic = result.data
@@ -76,12 +83,14 @@ async function showComicDownloadDirInFileManager() {
   const comicDownloadDir = store.pickedComic.comicDownloadDir
   if (comicDownloadDir === undefined || comicDownloadDir === null) {
     console.error('Comic download directory is undefined or null')
+    message.warning(() => t('common.open_directory_failed'))
     return
   }
 
   const result = await commands.showPathInFileManager(comicDownloadDir)
   if (result.status === 'error') {
     console.error(result.error)
+    message.error(() => t('common.open_directory_failed'))
   }
 }
 </script>

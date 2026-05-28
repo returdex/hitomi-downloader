@@ -170,6 +170,7 @@ async function showExportDirInFileManager() {
   const result = await commands.showPathInFileManager(store.config.exportDir)
   if (result.status === 'error') {
     console.error(result.error)
+    message.error(() => t('common.open_directory_failed'))
   }
 }
 
