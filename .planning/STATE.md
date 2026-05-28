@@ -1,6 +1,6 @@
 # Project State
 
-Last activity: 2026-05-04 - Completed quick task 260504-004: Move E-Hentai cookie fields into settings
+Last activity: 2026-05-28 - Added Phase 1 stabilization cleanup to the active milestone
 
 ## Current Focus
 
@@ -8,7 +8,14 @@ Stabilization for the existing Tauri/Vue app.
 
 ### Blockers/Concerns
 
-- `gsd-sdk` is not installed in this environment, so this quick task was executed inline with equivalent artifacts.
+- No active blockers.
+
+## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 1 added: Stabilization cleanup.
+- Backlog item 999.1 added: deferred UX polish after usage period.
 
 ### Quick Tasks Completed
 

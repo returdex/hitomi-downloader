@@ -2,15 +2,20 @@
 
 ## Active Milestone
 
-### 1. Stabilization
+### Milestone: Stabilization
 
 Improve day-to-day app quality with small, low-risk fixes.
 
-#### Candidate Work
+### Phase 1: Stabilization cleanup
 
-- Remove development-only debug output from user-facing flows.
-- Fix small UI class and formatting defects.
-- Keep build and type checks passing after each change.
+**Goal:** Clean up low-risk stabilization issues after the recent E-Hentai favorites work.
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+- [ ] Remove or confirm development-only debug output from user-facing flows.
+- [ ] Fix small UI class and formatting defects.
+- [ ] Keep build and type checks passing after each change.
 
 ## Backlog
 
