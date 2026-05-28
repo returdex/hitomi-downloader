@@ -13,7 +13,7 @@ Improve day-to-day app quality with small, low-risk fixes.
 **Plans:** 1 plan
 
 Plans:
-- [ ] 01-01 Stabilization cleanup (Wave 1): resolve date i18n TODOs, add focused user-visible error feedback, and run standard verification.
+- [x] 01-01 Stabilization cleanup (Wave 1): resolve date i18n TODOs, add focused user-visible error feedback, and run standard verification.
 
 ## Backlog
 
