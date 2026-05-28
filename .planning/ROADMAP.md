@@ -10,12 +10,10 @@ Improve day-to-day app quality with small, low-risk fixes.
 
 **Goal:** Clean up low-risk stabilization issues after the recent E-Hentai favorites work.
 **Requirements:** TBD
-**Plans:** 0 plans
+**Plans:** 1 plan
 
 Plans:
-- [ ] Remove or confirm development-only debug output from user-facing flows.
-- [ ] Fix small UI class and formatting defects.
-- [ ] Keep build and type checks passing after each change.
+- [ ] 01-01 Stabilization cleanup (Wave 1): resolve date i18n TODOs, add focused user-visible error feedback, and run standard verification.
 
 ## Backlog
 
