@@ -50,7 +50,7 @@ updated: 2026-07-29
 | 02-02-01 | 02 | 2 | VAL-01 | `pnpm test && pnpm build && cargo check --manifest-path src-tauri/Cargo.toml` | PASS |
 | 02-02-02 | 02 | 2 | VAL-01 | `Test-Path .planning/phases/01-stabilization-cleanup/01-VALIDATION.md` | PASS |
 | 02-03-01 | 03 | 3 | REL-01 | stash object/type/path and binary SHA-256 checks | PASS |
-| 02-03-02 | 03 | 3 | REL-01 | clean full gates plus candidate SHA symbol-negative scan | PENDING |
+| 02-03-02 | 03 | 3 | REL-01 | clean full gates plus candidate SHA symbol-negative scan | PASS |
 | 02-03-03 | 03 | 3 | REL-01, VAL-01 | restored SHA-256, four symbols, unstaged and stash-resolvable checks | PENDING |
 
 ## Wave 0
@@ -76,8 +76,8 @@ The build emitted the already-known non-blocking Vite warning for a minified chu
 - [x] Record pre-isolation binary diff SHA-256 and four expected symbols.
 - [x] Persist immutable stash object ID; require commit type and exactly `src/AppContent.vue`.
 - [x] Require stash binary diff SHA-256 equality.
-- [ ] Run tests/build/cargo from a clean tree and record full candidate commit SHA.
-- [ ] Candidate `AppContent.vue` lacks all four symbols; Phase 2 creates no tag.
+- [x] Run tests/build/cargo from a clean tree and record full candidate commit SHA.
+- [x] Candidate `AppContent.vue` lacks all four symbols; Phase 2 creates no tag.
 - [ ] Apply immutable stash object; on conflict/non-zero status retain stash and stop.
 - [ ] Restored binary diff SHA-256 is identical; each symbol exists individually.
 - [ ] `src/AppContent.vue` is unstaged and stash object remains resolvable.
@@ -115,3 +115,23 @@ verified with the strict first-parent equivalents
 and `git diff --binary <OID>^1 <OID> -- src/AppContent.vue` for the exact bytes.
 Both checks address the same stash commit and preserve the immutable-OID trust
 boundary.
+
+## Wave 3 Candidate Evidence
+
+**Release-candidate commit:** `5427e99eb9b14937b87c2ceec687bf23b911a654`
+
+| Gate | Result |
+|------|--------|
+| Candidate status | Worktree and index clean while the deferred patch was isolated |
+| Frontend tests | `pnpm test` passed: 1 file, 2 tests |
+| Production build | `pnpm build` passed: 4,354 modules transformed |
+| Rust check | `cargo check --manifest-path src-tauri/Cargo.toml` passed |
+| `onBeforeUnmount` in candidate AppContent | ABSENT |
+| `saveConfigDebounceDelay` in candidate AppContent | ABSENT |
+| `saveConfigTimer` in candidate AppContent | ABSENT |
+| `scheduleSaveConfig` in candidate AppContent | ABSENT |
+| Candidate changed AppContent | No paths from `git diff --name-only <candidate>^ <candidate> -- src/AppContent.vue` |
+
+The candidate is the clean commit tested while the deferred patch was absent.
+Phase 2 did not create, move, delete, push, or use a tag as acceptance evidence.
+Formal annotated `v1.0` tagging remains pending `$gsd-complete-milestone`.
