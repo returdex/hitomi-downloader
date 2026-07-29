@@ -1,62 +1,75 @@
 ---
 phase: 02
 slug: release-boundary-validation
-status: draft
+status: in_progress
 nyquist_compliant: false
-wave_0_complete: false
+wave_0_complete: true
 created: 2026-07-29
 updated: 2026-07-29
 ---
 
 # Phase 2 — Validation Strategy
 
-> Execution-time Nyquist contract. Pending rows must be replaced with measured evidence before phase completion.
+> Execution-time Nyquist contract. UI-01 and the runnable VAL-01 gates are green. REL-01 remains pending until Plan 03 records immutable release-boundary evidence.
 
 ## Test Infrastructure
 
-| Property | Value |
-|----------|-------|
-| Framework | Vitest 4.1.10 + Vue Test Utils 2.4.11 + happy-dom 20.11.1 (Wave 0 install) |
-| Config file | `vite.config.ts` (Wave 0 adds `test.environment`) |
-| Quick run command | `pnpm test -- src/panes/SearchPane.spec.ts` |
-| Full suite command | `pnpm test && pnpm build && cargo check --manifest-path src-tauri/Cargo.toml` |
-| Estimated runtime | Pending measurement during execution |
+| Property | Measured value |
+|----------|----------------|
+| Framework | Vitest 4.1.10 + Vue Test Utils 2.4.11 + happy-dom 20.11.1 |
+| Config file | `vite.config.ts` with `test.environment: 'happy-dom'` |
+| Focused command | `pnpm test -- src/panes/SearchPane.spec.ts` (non-watch `vitest run`) |
+| Full suite command | `pnpm test` (non-watch `vitest run`) |
+| Production build | `pnpm build` (`vue-tsc --noEmit && vite build`) |
+| Rust check | `cargo check --manifest-path src-tauri/Cargo.toml` |
+| Execution environment | Repository root, 2026-07-29 |
 
 ## Sampling Rate
 
 - After every implementation task: run its listed automated command.
 - After each wave: run the full suite applicable to artifacts then present.
-- Before phase verification: all runnable gates must be green.
+- Before phase verification: all currently runnable gates must be green.
 - No watch-mode command is permitted.
 
 ## Requirements-to-Test Map
 
 | Requirement | Observable behavior/evidence | Automated command | Artifact | Status |
 |-------------|------------------------------|-------------------|----------|--------|
-| UI-01 | Failed pagination retains prior page/results; success publishes page/results together. | `pnpm test -- src/panes/SearchPane.spec.ts` | `src/panes/SearchPane.spec.ts` | pending — Wave 0 |
-| VAL-01 | Focused/full tests, frontend build, Rust check, and per-task evidence are recorded. | `pnpm test && pnpm build && cargo check --manifest-path src-tauri/Cargo.toml` | `02-VALIDATION.md`, `02-VERIFICATION.md` | pending |
-| VAL-01 / PHASE-1 audit closure | Phase 1 receives explicitly retrospective Nyquist evidence grounded in its existing summary and verification. | `Test-Path .planning/phases/01-stabilization-cleanup/01-VALIDATION.md` | `01-VALIDATION.md` | pending |
-| REL-01 | Deferred patch is isolated to an immutable stash object and the clean tested candidate SHA excludes it. | Plan 03 candidate/stash commands | `02-VALIDATION.md` | pending — release gate |
-| REL-01 | Restored binary diff SHA-256 matches exactly, four symbols exist individually, file is unstaged, and stash remains resolvable. | Plan 03 restoration commands | working diff + stash object | pending — restoration gate |
+| UI-01 | Failed pagination retains prior page/results; success publishes page/results together. | `pnpm test -- src/panes/SearchPane.spec.ts` | `src/panes/SearchPane.spec.ts` | PASS — 2/2 tests |
+| VAL-01 | Focused/full tests, frontend build, Rust check, and per-task evidence are recorded. | `pnpm test && pnpm build && cargo check --manifest-path src-tauri/Cargo.toml` | this file and `02-VERIFICATION.md` | PASS — all runnable gates |
+| VAL-01 / PHASE-1 audit closure | Phase 1 receives explicitly retrospective Nyquist evidence grounded in its existing summary and verification. | `Test-Path .planning/phases/01-stabilization-cleanup/01-VALIDATION.md` | `01-VALIDATION.md` | PASS after Task 2 |
+| REL-01 | Deferred patch is isolated to an immutable stash object and the clean tested candidate SHA excludes it. | Plan 03 candidate/stash commands | this file | PENDING — release gate |
+| REL-01 | Restored binary diff SHA-256 matches exactly, four symbols exist individually, file is unstaged, and stash remains resolvable. | Plan 03 restoration commands | working diff + stash object | PENDING — restoration gate |
 
 ## Per-Task Verification Map
 
 | Task ID | Plan | Wave | Requirement | Automated Command | Status |
 |---------|------|------|-------------|-------------------|--------|
-| 02-01-01 | 01 | 1 | VAL-01 | `pnpm exec vitest run --passWithNoTests` | pending |
-| 02-01-02 | 01 | 1 | UI-01 | `pnpm test -- src/panes/SearchPane.spec.ts` | pending |
-| 02-02-01 | 02 | 2 | VAL-01 | `pnpm test && pnpm build && cargo check --manifest-path src-tauri/Cargo.toml` | pending |
-| 02-02-02 | 02 | 2 | VAL-01 | `Test-Path .planning/phases/01-stabilization-cleanup/01-VALIDATION.md` | pending |
-| 02-03-01 | 03 | 3 | REL-01 | stash object/type/path and binary SHA-256 checks | pending |
-| 02-03-02 | 03 | 3 | REL-01 | clean full gates plus candidate SHA symbol-negative scan | pending |
-| 02-03-03 | 03 | 3 | REL-01, VAL-01 | restored SHA-256, four symbols, unstaged and stash-resolvable checks | pending |
+| 02-01-01 | 01 | 1 | VAL-01 | `pnpm exec vitest run --passWithNoTests` | PASS — recorded by `02-01-SUMMARY.md` |
+| 02-01-02 | 01 | 1 | UI-01 | `pnpm test -- src/panes/SearchPane.spec.ts` | PASS — 1 file, 2 tests |
+| 02-02-01 | 02 | 2 | VAL-01 | `pnpm test && pnpm build && cargo check --manifest-path src-tauri/Cargo.toml` | PASS |
+| 02-02-02 | 02 | 2 | VAL-01 | `Test-Path .planning/phases/01-stabilization-cleanup/01-VALIDATION.md` | PASS |
+| 02-03-01 | 03 | 3 | REL-01 | stash object/type/path and binary SHA-256 checks | PENDING |
+| 02-03-02 | 03 | 3 | REL-01 | clean full gates plus candidate SHA symbol-negative scan | PENDING |
+| 02-03-03 | 03 | 3 | REL-01, VAL-01 | restored SHA-256, four symbols, unstaged and stash-resolvable checks | PENDING |
 
-## Wave 0 Requirements
+## Wave 0
 
-- [ ] Install pinned Vitest, Vue Test Utils, and happy-dom dependencies.
-- [ ] Add non-watch `pnpm test` and Vitest configuration.
-- [ ] Create `src/panes/SearchPane.spec.ts` with failure and success cases.
-- [ ] Confirm the focused command exits successfully.
+- [x] Pinned Vitest, Vue Test Utils, and happy-dom dependencies are installed.
+- [x] Non-watch `pnpm test` and Vitest configuration exist.
+- [x] `src/panes/SearchPane.spec.ts` covers failure retention and success publication.
+- [x] Focused command exits successfully: 1 file and 2 tests passed.
+
+## Wave 2 Evidence
+
+| Gate | Result | Measured evidence |
+|------|--------|-------------------|
+| Focused UI test | PASS | 1 file, 2 tests; Vitest duration 4.00 s; wall time 6.051 s |
+| Full frontend suite | PASS | 1 file, 2 tests; Vitest duration 4.00 s; wall time 6.042 s |
+| Production frontend build | PASS | 4,354 modules transformed; Vite build 5.35 s; wall time 13.827 s |
+| Rust check | PASS | dev profile completed in 20.52 s; wall time 20.585 s |
+
+The build emitted the already-known non-blocking Vite warning for a minified chunk larger than 500 kB. Rust emitted the already-known non-blocking `LoginResp` dead-code warning. No new failure or warning class was observed.
 
 ## Pending Release-Boundary Gates
 
@@ -72,11 +85,12 @@ updated: 2026-07-29
 
 ## Validation Sign-Off
 
-- [ ] Every task has automated verification.
-- [ ] Sampling continuity has no three-task gap.
-- [ ] Wave 0 is complete.
-- [ ] No watch-mode flags are used.
-- [ ] Full suite and all release gates are green.
-- [ ] Set `nyquist_compliant: true` and `status: complete` only after evidence is recorded.
+- [x] Every completed task has automated verification.
+- [x] Sampling continuity has no three-task gap.
+- [x] Wave 0 is complete.
+- [x] No watch-mode flags are used.
+- [x] Focused test, full suite, frontend build, and Rust check are green.
+- [ ] REL-01 candidate and restoration gates are green.
+- [ ] Set `nyquist_compliant: true` and `status: complete` after Plan 03 records real release evidence.
 
-**Approval:** pending
+**Wave 2 sign-off:** UI-01 and runnable VAL-01 evidence approved on 2026-07-29. Overall Nyquist compliance remains false solely because REL-01 is intentionally pending Plan 03.
