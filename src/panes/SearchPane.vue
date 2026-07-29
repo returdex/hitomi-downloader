@@ -76,8 +76,6 @@ async function handlePageChange(pageNum: number) {
     return
   }
 
-  currentPage.value = pageNum
-
   const result = await commands.getPage(store.searchResult.ids, pageNum)
   if (result.status === 'error') {
     console.error(result.error)
@@ -88,6 +86,7 @@ async function handlePageChange(pageNum: number) {
     return
   }
 
+  currentPage.value = pageNum
   store.searchResult = result.data
 }
 
