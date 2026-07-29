@@ -20,13 +20,12 @@ Plans:
 **Goal:** Establish an auditable v1.0 release boundary, fix pagination error-state consistency, and complete automated validation evidence.
 **Requirements:** REL-01, UI-01, VAL-01
 **Gap Closure:** Closes gaps from the v1.0 milestone audit.
-**Plans:** 0 plans
+**Plans:** 3 plans
 
-Planned work:
-- [ ] Preserve the uncommitted settings-save debounce for the next milestone while excluding it from the v1.0 release tag.
-- [ ] Keep pagination state aligned with displayed results when page loading fails.
-- [ ] Add automated validation for the affected UI state and produce Nyquist validation evidence.
-- [ ] Re-run the milestone audit against the clean v1.0 release boundary.
+Plans:
+- [ ] 02-01-PLAN.md — Add focused Vue test infrastructure and enforce success-only pagination state publication.
+- [ ] 02-02-PLAN.md — Run full automated gates and produce Nyquist plus phase-verification evidence.
+- [ ] 02-03-PLAN.md — Create the audited v1.0 tag, restore deferred debounce work, and re-run milestone audit readiness.
 
 ## Backlog
 
