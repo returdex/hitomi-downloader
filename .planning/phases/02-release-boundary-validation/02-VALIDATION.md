@@ -49,7 +49,7 @@ updated: 2026-07-29
 | 02-01-02 | 01 | 1 | UI-01 | `pnpm test -- src/panes/SearchPane.spec.ts` | PASS — 1 file, 2 tests |
 | 02-02-01 | 02 | 2 | VAL-01 | `pnpm test && pnpm build && cargo check --manifest-path src-tauri/Cargo.toml` | PASS |
 | 02-02-02 | 02 | 2 | VAL-01 | `Test-Path .planning/phases/01-stabilization-cleanup/01-VALIDATION.md` | PASS |
-| 02-03-01 | 03 | 3 | REL-01 | stash object/type/path and binary SHA-256 checks | PENDING |
+| 02-03-01 | 03 | 3 | REL-01 | stash object/type/path and binary SHA-256 checks | PASS |
 | 02-03-02 | 03 | 3 | REL-01 | clean full gates plus candidate SHA symbol-negative scan | PENDING |
 | 02-03-03 | 03 | 3 | REL-01, VAL-01 | restored SHA-256, four symbols, unstaged and stash-resolvable checks | PENDING |
 
@@ -73,9 +73,9 @@ The build emitted the already-known non-blocking Vite warning for a minified chu
 
 ## Pending Release-Boundary Gates
 
-- [ ] Record pre-isolation binary diff SHA-256 and four expected symbols.
-- [ ] Persist immutable stash object ID; require commit type and exactly `src/AppContent.vue`.
-- [ ] Require stash binary diff SHA-256 equality.
+- [x] Record pre-isolation binary diff SHA-256 and four expected symbols.
+- [x] Persist immutable stash object ID; require commit type and exactly `src/AppContent.vue`.
+- [x] Require stash binary diff SHA-256 equality.
 - [ ] Run tests/build/cargo from a clean tree and record full candidate commit SHA.
 - [ ] Candidate `AppContent.vue` lacks all four symbols; Phase 2 creates no tag.
 - [ ] Apply immutable stash object; on conflict/non-zero status retain stash and stop.
@@ -94,3 +94,24 @@ The build emitted the already-known non-blocking Vite warning for a minified chu
 - [ ] Set `nyquist_compliant: true` and `status: complete` after Plan 03 records real release evidence.
 
 **Wave 2 sign-off:** UI-01 and runnable VAL-01 evidence approved on 2026-07-29. Overall Nyquist compliance remains false solely because REL-01 is intentionally pending Plan 03.
+
+## Wave 3 Isolation Evidence
+
+| Check | Result |
+|-------|--------|
+| Pre-isolation status | Exactly ` M src/AppContent.vue`; cached path list empty |
+| Pre-isolation diff check | `git diff --check -- src/AppContent.vue` passed |
+| Reserved symbols | `onBeforeUnmount`, `saveConfigDebounceDelay`, `saveConfigTimer`, and `scheduleSaveConfig` each present |
+| Pre-isolation binary diff | 2,052 bytes; SHA-256 `ABE42397D10742EC4BC59D8664E24B5475C469D34776E9932B5CFFAD0B8BFC6C` |
+| Immutable stash object | `169b72a1f5edf5109ab205534a074cfd5f1646b5`; Git object type `commit` |
+| Full stash path inventory | Exactly `src/AppContent.vue` |
+| Stash binary diff | 2,052 bytes; SHA-256 `ABE42397D10742EC4BC59D8664E24B5475C469D34776E9932B5CFFAD0B8BFC6C` |
+| Isolated boundary | Worktree and index clean |
+
+The installed Git rejects the pathspec form of `git stash show` and treats a
+stash as a merge commit for `git diff-tree`. The immutable object was therefore
+verified with the strict first-parent equivalents
+`git diff --name-only <OID>^1 <OID>` (without a pathspec) for the full inventory
+and `git diff --binary <OID>^1 <OID> -- src/AppContent.vue` for the exact bytes.
+Both checks address the same stash commit and preserve the immutable-OID trust
+boundary.
