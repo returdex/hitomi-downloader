@@ -20,18 +20,18 @@ Plans:
 **Goal:** Establish an auditable v1.0 release boundary, fix pagination error-state consistency, and complete automated validation evidence.
 **Requirements:** REL-01, UI-01, VAL-01
 **Gap Closure:** Closes gaps from the v1.0 milestone audit.
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 
 Plans:
 
 **Wave 1**
-- [ ] 02-01-PLAN.md — Add focused Vue test infrastructure and enforce success-only pagination state publication.
+- [x] 02-01-PLAN.md — Add focused Vue test infrastructure and enforce success-only pagination state publication.
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 02-02-PLAN.md — Run full automated gates and produce Nyquist plus phase-verification evidence.
+- [x] 02-02-PLAN.md — Run full automated gates and produce Nyquist plus phase-verification evidence.
 
 **Wave 3** *(blocked on Wave 2 completion)*
-- [ ] 02-03-PLAN.md — Record the clean tested release-candidate SHA, restore deferred debounce work, and re-run milestone audit readiness; formal v1.0 tagging remains with milestone completion.
+- [x] 02-03-PLAN.md — Record the clean tested release-candidate SHA, restore deferred debounce work, and re-run milestone audit readiness; formal v1.0 tagging remains with milestone completion.
 
 Cross-cutting constraints:
 - Preserve the user-owned `src/AppContent.vue` debounce diff; never stage, commit, overwrite, or include it in the v1.0 candidate boundary.

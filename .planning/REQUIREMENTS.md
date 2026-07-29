@@ -1,7 +1,7 @@
 # Requirements: v1.0 Stabilization
 
 **Milestone:** v1.0
-**Coverage:** 1/4 requirements complete
+**Coverage:** 4/4 requirements complete
 **Last updated:** 2026-07-29 after milestone gap planning
 
 ## Completed Requirements
@@ -18,12 +18,12 @@
 
 ## Gap Closure Requirements
 
-- [ ] **REL-01** — Establish a clean v1.0 release boundary that excludes the
+- [x] **REL-01** — Establish a clean v1.0 release boundary that excludes the
   uncommitted settings-save debounce while preserving that work for the next
   milestone.
-- [ ] **UI-01** — Keep pagination state and displayed results consistent when
+- [x] **UI-01** — Keep pagination state and displayed results consistent when
   loading a requested page fails.
-- [ ] **VAL-01** — Add automated validation for the affected UI behavior and
+- [x] **VAL-01** — Add automated validation for the affected UI behavior and
   produce Nyquist validation evidence for the milestone.
 
 ## Out of Scope for v1.0
@@ -39,9 +39,9 @@
 | Requirement | Description | Phase | Status |
 |---|---|---:|---|
 | PHASE-1 | Low-risk stabilization cleanup | 1 | Complete |
-| REL-01 | Clean v1.0 release boundary | 2 | Pending |
-| UI-01 | Pagination failure-state consistency | 2 | Pending |
-| VAL-01 | Automated and Nyquist validation evidence | 2 | Pending |
+| REL-01 | Clean v1.0 release boundary | 2 | Complete |
+| UI-01 | Pagination failure-state consistency | 2 | Complete |
+| VAL-01 | Automated and Nyquist validation evidence | 2 | Complete |
 
 ## Audit Sources
 
