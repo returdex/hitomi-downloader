@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 import vue from '@vitejs/plugin-vue'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
@@ -29,6 +29,11 @@ export default defineConfig(async () => ({
       resolvers: [NaiveUiResolver()],
     }),
   ],
+
+  test: {
+    environment: 'happy-dom',
+    restoreMocks: true,
+  },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
