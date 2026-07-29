@@ -1,8 +1,8 @@
 ---
 phase: 02
 slug: release-boundary-validation
-status: in_progress
-nyquist_compliant: false
+status: complete
+nyquist_compliant: true
 wave_0_complete: true
 created: 2026-07-29
 updated: 2026-07-29
@@ -38,8 +38,8 @@ updated: 2026-07-29
 | UI-01 | Failed pagination retains prior page/results; success publishes page/results together. | `pnpm test -- src/panes/SearchPane.spec.ts` | `src/panes/SearchPane.spec.ts` | PASS — 2/2 tests |
 | VAL-01 | Focused/full tests, frontend build, Rust check, and per-task evidence are recorded. | `pnpm test && pnpm build && cargo check --manifest-path src-tauri/Cargo.toml` | this file and `02-VERIFICATION.md` | PASS — all runnable gates |
 | VAL-01 / PHASE-1 audit closure | Phase 1 receives explicitly retrospective Nyquist evidence grounded in its existing summary and verification. | `Test-Path .planning/phases/01-stabilization-cleanup/01-VALIDATION.md` | `01-VALIDATION.md` | PASS after Task 2 |
-| REL-01 | Deferred patch is isolated to an immutable stash object and the clean tested candidate SHA excludes it. | Plan 03 candidate/stash commands | this file | PENDING — release gate |
-| REL-01 | Restored binary diff SHA-256 matches exactly, four symbols exist individually, file is unstaged, and stash remains resolvable. | Plan 03 restoration commands | working diff + stash object | PENDING — restoration gate |
+| REL-01 | Deferred patch is isolated to an immutable stash object and the clean tested candidate SHA excludes it. | Plan 03 candidate/stash commands | this file | PASS |
+| REL-01 | Restored binary diff SHA-256 matches exactly, four symbols exist individually, file is unstaged, and stash remains resolvable. | Plan 03 restoration commands | working diff + stash object | PASS |
 
 ## Per-Task Verification Map
 
@@ -51,7 +51,7 @@ updated: 2026-07-29
 | 02-02-02 | 02 | 2 | VAL-01 | `Test-Path .planning/phases/01-stabilization-cleanup/01-VALIDATION.md` | PASS |
 | 02-03-01 | 03 | 3 | REL-01 | stash object/type/path and binary SHA-256 checks | PASS |
 | 02-03-02 | 03 | 3 | REL-01 | clean full gates plus candidate SHA symbol-negative scan | PASS |
-| 02-03-03 | 03 | 3 | REL-01, VAL-01 | restored SHA-256, four symbols, unstaged and stash-resolvable checks | PENDING |
+| 02-03-03 | 03 | 3 | REL-01, VAL-01 | restored SHA-256, four symbols, unstaged and stash-resolvable checks | PASS |
 
 ## Wave 0
 
@@ -78,10 +78,10 @@ The build emitted the already-known non-blocking Vite warning for a minified chu
 - [x] Require stash binary diff SHA-256 equality.
 - [x] Run tests/build/cargo from a clean tree and record full candidate commit SHA.
 - [x] Candidate `AppContent.vue` lacks all four symbols; Phase 2 creates no tag.
-- [ ] Apply immutable stash object; on conflict/non-zero status retain stash and stop.
-- [ ] Restored binary diff SHA-256 is identical; each symbol exists individually.
-- [ ] `src/AppContent.vue` is unstaged and stash object remains resolvable.
-- [ ] Formal annotated `v1.0` remains pending `$gsd-complete-milestone`.
+- [x] Apply immutable stash object; on conflict/non-zero status retain stash and stop.
+- [x] Restored binary diff SHA-256 is identical; each symbol exists individually.
+- [x] `src/AppContent.vue` is unstaged and stash object remains resolvable.
+- [x] Formal annotated `v1.0` remains pending `$gsd-complete-milestone`.
 
 ## Validation Sign-Off
 
@@ -90,8 +90,8 @@ The build emitted the already-known non-blocking Vite warning for a minified chu
 - [x] Wave 0 is complete.
 - [x] No watch-mode flags are used.
 - [x] Focused test, full suite, frontend build, and Rust check are green.
-- [ ] REL-01 candidate and restoration gates are green.
-- [ ] Set `nyquist_compliant: true` and `status: complete` after Plan 03 records real release evidence.
+- [x] REL-01 candidate and restoration gates are green.
+- [x] `nyquist_compliant: true` and `status: complete` are backed by real release evidence.
 
 **Wave 2 sign-off:** UI-01 and runnable VAL-01 evidence approved on 2026-07-29. Overall Nyquist compliance remains false solely because REL-01 is intentionally pending Plan 03.
 
@@ -135,3 +135,19 @@ boundary.
 The candidate is the clean commit tested while the deferred patch was absent.
 Phase 2 did not create, move, delete, push, or use a tag as acceptance evidence.
 Formal annotated `v1.0` tagging remains pending `$gsd-complete-milestone`.
+
+## Wave 3 Restoration Evidence
+
+| Check | Result |
+|-------|--------|
+| Restore command | `git stash apply 169b72a1f5edf5109ab205534a074cfd5f1646b5` passed without conflict |
+| Restored binary diff | 2,052 bytes; SHA-256 `ABE42397D10742EC4BC59D8664E24B5475C469D34776E9932B5CFFAD0B8BFC6C` |
+| Three-way integrity | Pre-isolation, immutable stash, and restored SHA-256 values are exactly equal |
+| Restored symbols | All four reserved symbols independently present |
+| Index protection | `src/AppContent.vue` absent from the index |
+| Recoverability | `git cat-file -e 169b72a1f5edf5109ab205534a074cfd5f1646b5^{commit}` passed after apply |
+
+REL-01 closes against candidate
+`5427e99eb9b14937b87c2ceec687bf23b911a654`; the restored debounce is
+user-owned work outside that candidate. UI-01 and VAL-01 remain green, and
+formal tag creation remains exclusively owned by `$gsd-complete-milestone`.
