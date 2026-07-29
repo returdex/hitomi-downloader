@@ -23,9 +23,19 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
+
+**Wave 1**
 - [ ] 02-01-PLAN.md — Add focused Vue test infrastructure and enforce success-only pagination state publication.
+
+**Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 02-02-PLAN.md — Run full automated gates and produce Nyquist plus phase-verification evidence.
-- [ ] 02-03-PLAN.md — Create the audited v1.0 tag, restore deferred debounce work, and re-run milestone audit readiness.
+
+**Wave 3** *(blocked on Wave 2 completion)*
+- [ ] 02-03-PLAN.md — Record the clean tested release-candidate SHA, restore deferred debounce work, and re-run milestone audit readiness; formal v1.0 tagging remains with milestone completion.
+
+Cross-cutting constraints:
+- Preserve the user-owned `src/AppContent.vue` debounce diff; never stage, commit, overwrite, or include it in the v1.0 candidate boundary.
+- Leave formal `v1.0` tag creation to `$gsd-complete-milestone`.
 
 ## Backlog
 
