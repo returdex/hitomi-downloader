@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to plan
+status: v1.0 milestone complete
 stopped_at: Phase 1 context gathered
-last_updated: "2026-07-29T11:46:17.747Z"
+last_updated: "2026-07-29T11:56:19.517Z"
 last_activity: 2026-07-29
 progress:
   total_phases: 3
@@ -20,7 +20,7 @@ Last activity: 2026-07-29
 
 ## Current Focus
 
-Stabilization for the existing Tauri/Vue app.
+Planning the next milestone for the existing Tauri/Vue app.
 
 ### Blockers/Concerns
 
@@ -33,18 +33,19 @@ Stabilization for the existing Tauri/Vue app.
 - Phase 1 added: Stabilization cleanup.
 - Backlog item 999.1 added: deferred UX polish after usage period.
 
+## Project Reference
+
+See: `.planning/PROJECT.md` (updated 2026-07-29)
+
+**Core value:** Reliable searching, downloading, browsing, and exporting of hitomi.la galleries.
+**Current focus:** Planning the next milestone.
+
 ## Session
 
-Stopped at: Phase 1 context gathered
-Resume file: [.planning/phases/01-stabilization-cleanup/01-CONTEXT.md](./phases/01-stabilization-cleanup/01-CONTEXT.md)
+Stopped at: v1.0 milestone complete
+Resume file: `.planning/PROJECT.md`
 
-Planned at: Phase 1 ready to execute with 1 plan
-Plan file: [.planning/phases/01-stabilization-cleanup/01-01-PLAN.md](./phases/01-stabilization-cleanup/01-01-PLAN.md)
-
-Completed plan: [.planning/phases/01-stabilization-cleanup/01-01-SUMMARY.md](./phases/01-stabilization-cleanup/01-01-SUMMARY.md)
-
-Verified at: Phase 1 complete with no gaps
-Verification file: [.planning/phases/01-stabilization-cleanup/01-VERIFICATION.md](./phases/01-stabilization-cleanup/01-VERIFICATION.md)
+Archived execution history: `.planning/milestones/v1.0-phases/`
 
 ### Quick Tasks Completed
 
